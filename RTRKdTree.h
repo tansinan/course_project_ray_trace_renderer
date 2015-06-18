@@ -1,0 +1,218 @@
+#ifndef RTRKDTREE_H
+#define RTRKDTREE_H
+
+#include "RTRGeometry.h"
+#include "RTRRenderElement.h"
+#include <QVector>
+#include <QSet>
+
+class RTRKdTree
+{
+protected:
+	class Node
+	{
+	public:
+		static const int SPLIT_BY_X = 0;
+		static const int SPLIT_BY_Y = 1;
+		static const int SPLIT_BY_Z = 2;
+		static const int SPLIT_NONE = 100;
+		int splitMethod;
+		RTRBoundingBox boundingBox;
+		Node* small;
+		Node* large;
+		QVector<RTRRenderElement*> data;
+	};
+
+protected:
+	Node* root;
+	RTRKdTree();
+
+public:
+	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0)
+	{
+		if(elementTable.size()<=2 || depth >= 20)
+		{
+			parent->small = parent->large = NULL;
+			parent->splitMethod = Node::SPLIT_NONE;
+			parent->data = elementTable;
+			return;
+		}
+		//int splitMethod = parent->splitMethod;
+
+		QVector<RTRRenderElement*> bestNewTableSmall;
+		QVector<RTRRenderElement*> bestNewTableLarge;
+		double bestMid = 0.0;
+		int bestSplitMethod = 0;
+		int minDuplicate = INT_MAX;
+
+		int splitMethod = -1;
+
+		/*for (int i = 0; i < elementTable.size(); i++)
+		{
+			if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
+			{
+				parent->data.append(elementTable[i]);
+			}
+		}*/
+
+		for (int method = 0; method < 3; method++)
+		{
+			int duplicate = 0;
+			QVector<RTRRenderElement*> newTableSmall;
+			QVector<RTRRenderElement*> newTableLarge;
+			QVector<double> divisionList;
+			for (int i = 0; i<elementTable.size(); i++)
+			{
+				divisionList.append(
+					(elementTable[i]->getBoundingBox().point1(method) + elementTable[i]->getBoundingBox().point2(method)) / 2);
+				//divisionList.append(elementTable[i]->getBoundingBox().point1(method));
+				//divisionList.append(elementTable[i]->getBoundingBox().point2(method));
+			}
+			qSort(divisionList);
+			double mid = divisionList.size() % 2 == 0 ? 
+				(divisionList[divisionList.size() / 2] + divisionList[divisionList.size() / 2 - 1])/2:
+				divisionList[divisionList.size() / 2];
+			for (int i = 0; i < elementTable.size(); i++)
+			{
+				double valSmall = elementTable[i]->getBoundingBox().point1(method);
+				double valLarge = elementTable[i]->getBoundingBox().point2(method);
+				/*if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
+				{
+					//parent->data.append(elementTable[i]);
+					continue;
+				}*/
+				if (valSmall < mid)
+				{
+					newTableSmall.append(elementTable[i]);
+				}
+				if (valLarge >= mid)
+				{
+					newTableLarge.append(elementTable[i]);
+				}
+				if (valSmall < mid && valLarge >= mid)
+				{
+					duplicate++;
+				}
+			}
+			if (duplicate < minDuplicate)
+			{
+				minDuplicate = duplicate;
+				bestNewTableLarge = newTableLarge;
+				bestNewTableSmall = newTableSmall;
+				splitMethod = parent->splitMethod = method;
+				bestMid = mid;
+			}
+		}
+
+		if (minDuplicate / (double)elementTable.size() > 0.6)
+		{
+			depth = 100;
+		}
+		Node* nodeSmall = new Node();
+		Node* nodeLarge = new Node();
+		parent->small = nodeSmall;
+		parent->large = nodeLarge;
+		nodeSmall->boundingBox = nodeLarge->boundingBox = parent->boundingBox;
+		nodeSmall->boundingBox.point2(splitMethod) = bestMid;
+		nodeLarge->boundingBox.point1(splitMethod) = bestMid;
+		//nodeSmall->splitMethod = nodeLarge->splitMethod = (parent->splitMethod+1) % 3;
+		construct(nodeSmall, bestNewTableSmall, depth+1);
+		construct(nodeLarge, bestNewTableLarge, depth+1);
+	}
+
+	static RTRKdTree* create(const QVector<RTRRenderElement*>& elementTable)
+	{
+		RTRKdTree* ret = new RTRKdTree();
+		if(elementTable.size()==0) return NULL;
+		RTRBoundingBox boundingBox;
+		for(int i=0;i<3;i++)
+		{
+			boundingBox.point1(i) = 1e100;
+			boundingBox.point2(i) = -1e100;
+		}
+		for(int i=0;i<elementTable.size();i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if(elementTable[i]->getBoundingBox().point1(j)<boundingBox.point1(j))
+					boundingBox.point1(j) = elementTable[i]->getBoundingBox().point1(j);
+				if(elementTable[i]->getBoundingBox().point2(j)>boundingBox.point2(j))
+					boundingBox.point2(j) = elementTable[i]->getBoundingBox().point2(j);
+			}
+		}
+		for(int i=0;i<3;i++)
+		{
+			boundingBox.point1(i) -= 0.01;
+			boundingBox.point2(i) += 0.01;
+		}
+		ret->root = new Node();
+		ret->root->boundingBox = boundingBox;
+		ret->root->splitMethod = Node::SPLIT_BY_X;
+		construct(ret->root, elementTable);
+		return ret;
+	}
+
+	void search(QSet<RTRRenderElement*>& searchResult, const RTRSegment& segment)
+	{
+		RTRVector newPoint1 = segment.pointAt(root->splitMethod, root->boundingBox.point1(root->splitMethod));
+		RTRVector newPoint2 = segment.pointAt(root->splitMethod, root->boundingBox.point2(root->splitMethod));
+		RTRSegment segment2(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
+		search(root, searchResult, segment2);
+	}
+
+	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment)
+	{
+		int splitMethod = node->splitMethod;
+		if (node->large == NULL)
+		{
+			for (int i = 0; i < node->data.size(); i++)
+			{
+				searchResult.insert(node->data[i]);
+			}
+			return;
+		}
+		if (segment.beginningPoint(splitMethod) > segment.endPoint(splitMethod))
+		{
+			std::swap(segment.beginningPoint, segment.endPoint);
+		}
+		//segment.beginningPoint(splitMethod)
+		for (int i = 0; i < node->data.size(); i++)
+		{
+			searchResult.insert(node->data[i]);
+		}
+		if (segment.endPoint(splitMethod) < node->boundingBox.point1(splitMethod))
+		{
+			return;
+		}
+		if (segment.beginningPoint(splitMethod) > node->boundingBox.point2(splitMethod))
+		{
+			return;
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			double smallVal = min(segment.endPoint(i), segment.beginningPoint(i));
+			double largeVal = max(segment.endPoint(i), segment.beginningPoint(i));
+			if (largeVal < node->boundingBox.point1(i)) return;
+			if (smallVal > node->boundingBox.point2(i)) return;
+		}
+		if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod)-(1e-5))
+		{
+			search(node->small, searchResult, segment);
+			return;
+		}
+		if (segment.beginningPoint(splitMethod) > node->small->boundingBox.point2(splitMethod)+(1e-5))
+		{
+			search(node->large, searchResult, segment);
+			return;
+		}
+		RTRSegment segmentSmallTemp, segmentLargeTemp;
+		segmentSmallTemp.beginningPoint = segment.beginningPoint;
+		segmentLargeTemp.endPoint = segment.endPoint;
+		RTRVector midPoint = segment.pointAt(splitMethod, node->small->boundingBox.point2(splitMethod));
+		segmentSmallTemp.endPoint = segmentLargeTemp.beginningPoint = midPoint;
+		search(node->large, searchResult, segmentLargeTemp);
+		search(node->small, searchResult, segmentSmallTemp);
+	}
+};
+
+#endif // RTRKDTREE_H
