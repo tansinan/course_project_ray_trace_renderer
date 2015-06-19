@@ -8,7 +8,7 @@
 RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
-	model->loadModelFromObjFile(QString("D:\\Documents\\glass.obj"));
+	model->loadModelFromObjFile(QString("D:\\Documents\\cube.obj"));
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
 }

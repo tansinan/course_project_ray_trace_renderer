@@ -6,6 +6,9 @@
 
 class RTRRenderElement
 {
+protected:
+	int orthProjectDirection;
+	RTRTriangle2D* orthProjectTriangle;
 public:
 	RTRRenderElement();
 	RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera);
@@ -14,7 +17,7 @@ public:
 	RTRMaterial* material;
 	RTRBoundingBox boundingBox;
 	virtual const RTRBoundingBox& getBoundingBox() const;
-	virtual bool intersect(const RTRRay& ray, RTRVector3D& result) const;
+	virtual bool intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal) const;
 	QString objectName;
 	//virtual const RTRVector3D& getCentroid() const;
 };

@@ -37,6 +37,8 @@ void RTRRenderer::render()
 	//扫描所有需要渲染的多边形
 	for(int i=0;i<model->faces.size();i++)
 	{
+		//TODO : 只适用于凸多边形！
+
 		RTRFace& face = model->faces[i];
 		//三角形的三个顶点
 		RTRVector point1(3), point2(3), point3(3);
@@ -176,20 +178,33 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
 		{
 			flag = true;
 		}
-		RTRTriangle3D& triangle = *element->triangle3D;
-		RTRVector2D point = RTRGeometry::intersect(triangle.plane,ray);
+		RTRVector3D point;
+		RTRVector3D normal;
+		/*RTRTriangle3D& triangle = *element->triangle3D;
+		RTRVector3D point = RTRGeometry::intersect(triangle.plane,ray);
 		RTRTriangle2D& triangle2D = *element->triangle2D;
 		bool slowChkFail = !RTRGeometry::pointInsideTriangle(triangle2D, camera->transformPoint(point));
-		if (slowChkFail) continue;
+		if ((!slowChkFail) != element->intersect(ray, point2, normal2))
+		{
+			int a = 0;
+			a++;
+		}
+		if (slowChkFail) continue;*/
+		if (!element->intersect(ray, point, normal))
+		{
+			continue;
+		}
 		if(point.z() < minZ)
 		{
 			continue;
 		}
 		minZ = point.z();
 		RTRVector v =lightPoint.directionAt(point);
-		double decay = lightPoint.directionAt(point).dotProduct(triangle.plane.normal);
+		//double decay = lightPoint.directionAt(point).dotProduct(triangle.plane.normal);
+		double decay = lightPoint.directionAt(point).dotProduct(normal);
 		int sym1 = sgn(decay);
-		int sym2 = sgn((point-camera->cameraPosition).dotProduct(triangle.plane.normal));
+		//int sym2 = sgn((point-camera->cameraPosition).dotProduct(triangle.plane.normal));
+		int sym2 = sgn((point - camera->cameraPosition).dotProduct(normal));
 		decay = decay>0?decay:-decay;
 		if(sym1 == sym2)
 		{

@@ -63,7 +63,7 @@ RTRSegment2D::RTRSegment2D(const RTRVector &param1, const RTRVector& param2, int
 	intersectY = beginningPoint.y() - slopeY * beginningPoint.x();
 
 	//x = slopeX * y + intersectX
-	slopeX = direction.y()/direction.x();
+	slopeX = direction.x()/direction.y();
 	intersectX = beginningPoint.x() - slopeX * beginningPoint.y();
 }
 
@@ -94,18 +94,18 @@ void RTRSegment2D::reset(const RTRVector &param1, const RTRVector& param2, int c
 	intersectY = beginningPoint.y() - slopeY * beginningPoint.x();
 
 	//x = slopeX * y + intersectX
-	slopeX = direction.y()/direction.x();
+	slopeX = direction.x()/direction.y();
 	intersectX = beginningPoint.x() - slopeX * beginningPoint.y();
 }
 
 
 int RTRSegment2D::pointSign(const RTRVector2D& point) const
 {
-	if(std::isnormal(slopeY))
+	if((!std::isinf(slopeY)) && (!std::isnan(slopeY))/* && abs(slopeY )< 1.0e10*/)
 	{
 		return point.y() > point.x()*slopeY + intersectY ? 1 : -1;
 	}
-	else return point.x() > beginningPoint.x() ? 1 : -1;
+	else return point.x() > intersectX ? 1 : -1;
 }
 
 RTRTriangle3D::RTRTriangle3D(const RTRVector& vert1, const RTRVector& vert2, const RTRVector& vert3)
