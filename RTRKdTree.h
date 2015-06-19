@@ -172,8 +172,8 @@ public:
 		}
 		for(int i=0;i<3;i++)
 		{
-			boundingBox.point1(i) -= 0.01;
-			boundingBox.point2(i) += 0.01;
+			boundingBox.point1(i) -= 0.001;
+			boundingBox.point2(i) += 0.001;
 		}
 		ret->root = new Node();
 		ret->root->boundingBox = boundingBox;
@@ -193,38 +193,17 @@ public:
 	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment)
 	{
 		int splitMethod = node->splitMethod;
-		if (node->large == NULL)
+		if (!RTRGeometry::intersect(node->boundingBox, segment)) return;
+		for (int i = 0; i < node->data.size(); i++)
 		{
-			for (int i = 0; i < node->data.size(); i++)
-			{
-				searchResult.insert(node->data[i]);
-			}
-			return;
+			searchResult.insert(node->data[i]);
 		}
+		if (node->large == NULL) return;
 		if (segment.beginningPoint(splitMethod) > segment.endPoint(splitMethod))
 		{
 			std::swap(segment.beginningPoint, segment.endPoint);
 		}
 		//segment.beginningPoint(splitMethod)
-		for (int i = 0; i < node->data.size(); i++)
-		{
-			searchResult.insert(node->data[i]);
-		}
-		if (segment.endPoint(splitMethod) < node->boundingBox.point1(splitMethod))
-		{
-			return;
-		}
-		if (segment.beginningPoint(splitMethod) > node->boundingBox.point2(splitMethod))
-		{
-			return;
-		}
-		for (int i = 0; i < 3; i++)
-		{
-			double smallVal = min(segment.endPoint(i), segment.beginningPoint(i));
-			double largeVal = max(segment.endPoint(i), segment.beginningPoint(i));
-			if (largeVal < node->boundingBox.point1(i)) return;
-			if (smallVal > node->boundingBox.point2(i)) return;
-		}
 		if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod)-(1e-5))
 		{
 			search(node->small, searchResult, segment);

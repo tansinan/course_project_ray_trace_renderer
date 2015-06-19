@@ -235,6 +235,18 @@ bool RTRGeometry::pointInsideTriangle(const RTRTriangle2D &triangle2D, const RTR
 	return true;
 }
 
+bool RTRGeometry::intersect(const RTRBoundingBox& boundingBox, RTRSegment &segment)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (segment.beginningPoint(i) > segment.endPoint(i)) std::swap(segment.beginningPoint, segment.endPoint);
+		if (segment.beginningPoint(i) > boundingBox.point2(i) || segment.endPoint(i) < boundingBox.point1(i)) return false;
+		if (segment.beginningPoint(i) < boundingBox.point1(i)) segment.beginningPoint = segment.pointAt(i, boundingBox.point1(i));
+		if (segment.endPoint(i) > boundingBox.point2(i)) segment.endPoint = segment.pointAt(i, boundingBox.point2(i));
+	}
+	return true;
+}
+
 RTRBoundingBox::RTRBoundingBox()
 	:point1(3), point2(3)
 {
