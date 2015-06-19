@@ -180,16 +180,6 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
 		}
 		RTRVector3D point;
 		RTRVector3D normal;
-		/*RTRTriangle3D& triangle = *element->triangle3D;
-		RTRVector3D point = RTRGeometry::intersect(triangle.plane,ray);
-		RTRTriangle2D& triangle2D = *element->triangle2D;
-		bool slowChkFail = !RTRGeometry::pointInsideTriangle(triangle2D, camera->transformPoint(point));
-		if ((!slowChkFail) != element->intersect(ray, point2, normal2))
-		{
-			int a = 0;
-			a++;
-		}
-		if (slowChkFail) continue;*/
 		if (!element->intersect(ray, point, normal))
 		{
 			continue;
@@ -200,10 +190,8 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
 		}
 		minZ = point.z();
 		RTRVector v =lightPoint.directionAt(point);
-		//double decay = lightPoint.directionAt(point).dotProduct(triangle.plane.normal);
 		double decay = lightPoint.directionAt(point).dotProduct(normal);
 		int sym1 = sgn(decay);
-		//int sym2 = sgn((point-camera->cameraPosition).dotProduct(triangle.plane.normal));
 		int sym2 = sgn((point - camera->cameraPosition).dotProduct(normal));
 		decay = decay>0?decay:-decay;
 		if(sym1 == sym2)
