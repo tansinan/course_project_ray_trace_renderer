@@ -17,7 +17,7 @@ public:
 	RTRMaterial* material;
 	RTRBoundingBox boundingBox;
 	virtual const RTRBoundingBox& getBoundingBox() const;
-	virtual bool intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal) const;
+	virtual bool intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const;
 	QString objectName;
 	//virtual const RTRVector3D& getCentroid() const;
 };

@@ -152,7 +152,7 @@ void RTRRenderer::renderLineByDDA(RTRVector p1, RTRVector p2, const QColor &colo
 }
 
 
-RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
+RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, RTRRenderElement* elementFrom)
 {
 	//RTRVector* vec3D = new RTRVector(3)[100];
 	RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRVector(1,1,1),7.5);
@@ -178,9 +178,10 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
 		{
 			flag = true;
 		}
-		RTRVector3D point;
-		RTRVector3D normal;
-		if (!element->intersect(ray, point, normal))
+		RTRVector3D point(3);
+		RTRVector3D normal(3);
+		RTRColor objColor(3);
+		if (!element->intersect(ray, point, normal, objColor))
 		{
 			continue;
 		}
@@ -197,9 +198,9 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount)
 		if(sym1 == sym2)
 		{
 			RTRColor lightColor = lightPoint.colorAt(point);
-			color.r() = material.diffuse.redF()*lightColor.r()*decay;
-			color.g() = material.diffuse.greenF()*lightColor.g()*decay;
-			color.b() = material.diffuse.blueF()*lightColor.b()*decay;
+			color.r() = objColor.r()*lightColor.r()*decay;
+			color.g() = objColor.g()*lightColor.g()*decay;
+			color.b() = objColor.b()*lightColor.b()*decay;
 		}
 		else
 		{

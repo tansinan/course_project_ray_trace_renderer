@@ -75,28 +75,47 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 	orthProjectTriangle = new RTRTriangle2D(vert1, vert2, vert3);
 }
 
-bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal) const
+bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const
 {
 	result = RTRGeometry::intersect(triangle3D->plane, ray);
 	normal = triangle3D->plane.normal;
 	RTRVector2D temp(2);
+	bool ret = true;
 	if (orthProjectDirection == 0)
 	{
 		temp.x() = result.y();
 		temp.y() = result.z();
-		return RTRGeometry::pointInsideTriangle(*orthProjectTriangle,temp);
+		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle,temp);
 	}
-	if (orthProjectDirection == 1)
+	else if (orthProjectDirection == 1)
 	{
 		temp.x() = result.x();
 		temp.y() = result.z();
-		return RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
+		ret =  RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
 	}
 	if (orthProjectDirection == 2)
 	{
 		temp.x() = result.x();
 		temp.y() = result.y();
-		return RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
+		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
 	}
-	return true;
+	if (!ret) return false;
+	if (objectName != "Plane")
+	{
+		color.r() = color.g() = color.b() = 1.0;
+	}
+	else
+	{
+		int x = qRound(result.x());
+		int y = qRound(result.y());
+		if ((x + y) % 2 == 0)
+		{
+			color.r() = color.g() = color.b() = 0.25;
+		}
+		else
+		{
+			color.r() = color.g() = color.b() = 0.75;
+		}
+	}
+	return ret;
 }
