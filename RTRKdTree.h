@@ -30,6 +30,36 @@ protected:
 public:
 	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0)
 	{
+		//Thrink the size first
+		RTRBoundingBox boundingBox;
+		for (int i = 0; i<3; i++)
+		{
+			boundingBox.point1(i) = 1e100;
+			boundingBox.point2(i) = -1e100;
+		}
+		for (int i = 0; i<elementTable.size(); i++)
+		{
+			for (int j = 0; j<3; j++)
+			{
+				if (elementTable[i]->getBoundingBox().point1(j)<boundingBox.point1(j))
+					boundingBox.point1(j) = elementTable[i]->getBoundingBox().point1(j);
+				if (elementTable[i]->getBoundingBox().point2(j)>boundingBox.point2(j))
+					boundingBox.point2(j) = elementTable[i]->getBoundingBox().point2(j);
+			}
+		}
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (boundingBox.point1(i) > parent->boundingBox.point1(i))
+			{
+				parent->boundingBox.point1(i) = boundingBox.point1(i);
+			}
+			if (boundingBox.point2(i) < parent->boundingBox.point2(i))
+			{
+				parent->boundingBox.point2(i) = boundingBox.point2(i);
+			}
+		}
+
 		if(elementTable.size()<=2 || depth >= 20)
 		{
 			parent->small = parent->large = NULL;

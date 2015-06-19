@@ -113,10 +113,11 @@ class RTRCamera;
 class RTRGeometry
 {
 public:
-	static bool pointInsideTriange(RTRTriangle3D, RTRVector);
+	//static bool pointInsideTriange(RTRTriangle3D, RTRVector);
 	static bool pointInsideTriangle(const RTRTriangle2D& triangle2D, const RTRVector2D &point);
 	//static bool intersect(RTRTriangle3D, RTRSegment);
 	static RTRVector intersect(const RTRPlane &plane, const RTRSegment &segment);
+	static bool intersect(const RTRBoundingBox& boundingBox, RTRSegment segment);
 	static RTRVector project(const RTRVector& point, const RTRCamera& camera);
 	static RTRSegment project(const RTRSegment& segment, const RTRCamera& camera);
 	static RTRTriangle2D project(const RTRTriangle3D &triangle3D, const RTRCamera &camera);
