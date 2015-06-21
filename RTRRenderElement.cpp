@@ -37,7 +37,7 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		abs(triangle3D->vertices[0].y() - triangle3D->vertices[2].y())));
 
 	double rangeZ = qMax(abs(triangle3D->vertices[0].z() - triangle3D->vertices[1].z()),
-		qMax(abs(triangle3D->vertices[1].z() - triangle3D->vertices[2].z()),
+		qMax(std::abs(triangle3D->vertices[1].z() - triangle3D->vertices[2].z()),
 		abs(triangle3D->vertices[0].z() - triangle3D->vertices[2].z())));
 
 	RTRVector2D vert1(2), vert2(2), vert3(2);

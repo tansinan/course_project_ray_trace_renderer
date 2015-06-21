@@ -406,7 +406,7 @@ QColor RTRMatrix::toQtColor() const
 
 	if(g()<0) ret.setGreen(0);
 	else if(g()>1) ret.setGreenF(1.0);
-	else ret.setGreenF(r());
+	else ret.setGreenF(g());
 
 	if(b()<0) ret.setBlue(0);
 	else if(b()>1) ret.setBlueF(1.0);

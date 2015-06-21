@@ -16,7 +16,7 @@ RTRSegment::RTRSegment(RTRVector param1, RTRVector param2, int createMode)
 	case CREATE_FROM_POINTS:
 		beginningPoint = param1;
 		endPoint = param2;
-		direction = beginningPoint - endPoint;
+		direction = endPoint - beginningPoint;
 		direction.vectorNormalize();
 		break;
 	case CREATE_FROM_POINT_AND_DIRECTION:
@@ -45,7 +45,7 @@ RTRSegment2D::RTRSegment2D(const RTRVector &param1, const RTRVector& param2, int
 	case CREATE_FROM_POINTS:
 		beginningPoint = param1;
 		endPoint = param2;
-		direction = beginningPoint - endPoint;
+		direction = endPoint - beginningPoint;
 		direction.vectorNormalize();
 		break;
 	case CREATE_FROM_POINT_AND_DIRECTION:

@@ -33,7 +33,7 @@ public:
 	 * @param elementFrom 发出该逆向光线的渲染元素。该参数主要用于防止发生光线求交误判为和自己想交的情况。
 	 * @return 获得的颜色数值。
 	 */
-	RTRColor renderRay(const RTRRay& ray, int iterationCount = 0, RTRRenderElement* elementFrom = NULL);
+	RTRColor renderRay(const RTRRay& ray, int iterationCount = 0, const RTRRenderElement* elementFrom = NULL);
 };
 
 #endif // RTRRENDERER_H

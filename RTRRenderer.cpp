@@ -152,7 +152,7 @@ void RTRRenderer::renderLineByDDA(RTRVector p1, RTRVector p2, const QColor &colo
 }
 
 
-RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, RTRRenderElement* elementFrom)
+RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTRRenderElement* elementFrom)
 {
 	//RTRVector* vec3D = new RTRVector(3)[100];
 	RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRVector(1,1,1),7.5);
@@ -166,51 +166,69 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, RTRRender
 
 	elementsCache->search(possibleElements, ray);
 
-	//TODO:
+	//TODO: check 3D Z Order Algorithm
 
-	RTRColor color(3);
-	color.r() = color.g() = color.b() = 0.0;
-	double minZ = -1e50;
+	RTRColor diffuseColor(0.0, 0.0, 0.0);
+	double minZ = 1e50;
+	const RTRRenderElement* frontElement = NULL;
+
+	RTRVector3D intersectPoint(0.0, 0.0, 0.0);
+	RTRVector3D intersectNormal(0.0, 0.0, 0.0);
+	RTRColor intersectColor(0.0, 0.0, 0.0);
 	foreach(const RTRRenderElement* element, possibleElements)
 	{
-		bool flag = false;
-		if (element->objectName == "Plane")
-		{
-			flag = true;
-		}
-		RTRVector3D point(3);
-		RTRVector3D normal(3);
-		RTRColor objColor(3);
-		if (!element->intersect(ray, point, normal, objColor))
-		{
-			continue;
-		}
-		if(point.z() < minZ)
-		{
-			continue;
-		}
-		minZ = point.z();
+		RTRVector3D point(0.0, 0.0, 0.0);
+		RTRVector3D normal(0.0, 0.0, 0.0);
+		RTRColor objColor(0.0, 0.0, 0.0);
+		if (!element->intersect(ray, point, normal, objColor)) continue;
+		double zValue = ray.direction.dotProduct(point - ray.beginningPoint);
+		if (zValue < 0) continue;
+		if (zValue > minZ) continue;
+		if (element == elementFrom) continue;
+		frontElement = element;
+		intersectPoint = point;
+		intersectColor = objColor;
+		intersectNormal = normal;
+		minZ = zValue;
 		RTRVector v =lightPoint.directionAt(point);
 		double decay = lightPoint.directionAt(point).dotProduct(normal);
 		int sym1 = sgn(decay);
-		int sym2 = sgn((point - camera->cameraPosition).dotProduct(normal));
+		int sym2 = sgn((point - ray.beginningPoint).dotProduct(normal));
 		decay = decay>0?decay:-decay;
 		if(sym1 == sym2)
 		{
 			RTRColor lightColor = lightPoint.colorAt(point);
-			color.r() = objColor.r()*lightColor.r()*decay;
-			color.g() = objColor.g()*lightColor.g()*decay;
-			color.b() = objColor.b()*lightColor.b()*decay;
+			diffuseColor.r() = objColor.r()*lightColor.r()*decay;
+			diffuseColor.g() = objColor.g()*lightColor.g()*decay;
+			diffuseColor.b() = objColor.b()*lightColor.b()*decay;
 		}
 		else
 		{
-			color.r() = 0.0;
-			color.g() = 0.0;
-			color.b() = 0.0;
+			diffuseColor.r() = 0.0;
+			diffuseColor.g() = 0.0;
+			diffuseColor.b() = 0.0;
 		}
 	}
 
-	return color;
+	RTRColor reflectionColor(1.0,0.0,0.0);
+	if (frontElement != NULL && frontElement->objectName == "Cube_Cube.001" && iterationCount<2)
+	{
+		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
+		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
+		RTRRay reflectionRay(intersectPoint,reflectionDirection,RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
+		reflectionColor = renderRay(reflectionRay, iterationCount + 1, frontElement);
+		if (reflectionColor.r() >= 0.999&&reflectionColor.g() >= 0.999&&reflectionColor.b() >= 0.999)
+		{
+			int a = 0;
+			a++;
+		}
+		qDebug() << reflectionColor.r() << reflectionColor.g() << reflectionColor.b();
+		return reflectionColor*0.5 + diffuseColor*0.5;
+	}
+	else
+	{
+		return diffuseColor;
+	}
 }
 
 void RTRRenderer::renderPixel(int x, int y, double z, const RTRColor& color)

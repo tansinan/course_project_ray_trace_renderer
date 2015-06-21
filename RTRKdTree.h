@@ -182,7 +182,7 @@ public:
 		return ret;
 	}
 
-	void search(QSet<RTRRenderElement*>& searchResult, const RTRSegment& segment)
+	void search(QSet<RTRRenderElement*>& searchResult, const RTRSegment& segment) const
 	{
 		RTRVector newPoint1 = segment.pointAt(root->splitMethod, root->boundingBox.point1(root->splitMethod));
 		RTRVector newPoint2 = segment.pointAt(root->splitMethod, root->boundingBox.point2(root->splitMethod));
@@ -190,7 +190,7 @@ public:
 		search(root, searchResult, segment2);
 	}
 
-	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment)
+	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment) const
 	{
 		int splitMethod = node->splitMethod;
 		if (!RTRGeometry::intersect(node->boundingBox, segment)) return;
