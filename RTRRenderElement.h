@@ -3,6 +3,7 @@
 
 #include "RTRGeometry.h"
 #include "RTRMaterial.h"
+#include "RTRColor.h"
 
 class RTRRenderElement
 {

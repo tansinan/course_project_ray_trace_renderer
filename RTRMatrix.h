@@ -58,15 +58,6 @@ public:
 	double y() const;
 	double& z();
 	double z() const;
-	double& r();
-	double r()const;
-	double& g();
-	double g() const;
-	double& b();
-	double b() const;
-	double& a();
-	double a() const;
-	QColor toQtColor() const;
 	void printDebugInfo() const
 	{
 		cout << "[" <<endl;
@@ -85,8 +76,8 @@ public:
 typedef RTRMatrix RTRVector;
 typedef RTRMatrix RTRVector2D;
 typedef RTRMatrix RTRVector3D;
-typedef RTRMatrix RTRColor;
+/*typedef RTRMatrix RTRColor;
 typedef RTRMatrix RTRColorRGB;
-typedef RTRMatrix RTRColorRGBA;
+typedef RTRMatrix RTRColorRGBA;*/
 
 #endif // RTRMATRIX_H

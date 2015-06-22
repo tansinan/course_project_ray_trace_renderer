@@ -2,6 +2,7 @@
 #define RTRPOINTLIGHT_H
 
 #include "RTRLightAbstract.h"
+#include "RTRColor.h"
 
 /**
  * @brief RTRLightPoint类定义了一个点光源

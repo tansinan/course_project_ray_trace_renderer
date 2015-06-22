@@ -322,48 +322,6 @@ double RTRMatrix::z() const
 	return data[2];
 }
 
-double& RTRMatrix::r()
-{
-	return x();
-}
-
-double RTRMatrix::r() const
-{
-	return x();
-}
-
-double& RTRMatrix::g()
-{
-	return y();
-}
-
-double RTRMatrix::g() const
-{
-	return y();
-}
-
-double& RTRMatrix::b()
-{
-	return z();
-}
-
-double RTRMatrix::b() const
-{
-	return z();
-}
-
-double& RTRMatrix::a()
-{
-	Q_ASSERT(isVector()&&size>=4);
-	return data[3];
-}
-
-double RTRMatrix::a() const
-{
-	Q_ASSERT(isVector()&&size>=4);
-	return data[3];
-}
-
 RTRMatrix RTRVector::crossProduct(const RTRMatrix& other) const
 {
 	Q_ASSERT(isVector()&&size==3&&other.isVector()&&other.size==3);
@@ -394,22 +352,4 @@ RTRMatrix::RTRMatrix(double x, double y, double z)
 	data[0] = x;
 	data[1] = y;
 	data[2] = z;
-}
-
-QColor RTRMatrix::toQtColor() const
-{
-	Q_ASSERT(isVector()&&size==3||size==4);
-	QColor ret;
-	if(r()<0) ret.setRed(0);
-	else if(r()>1) ret.setRedF(1.0);
-	else ret.setRedF(r());
-
-	if(g()<0) ret.setGreen(0);
-	else if(g()>1) ret.setGreenF(1.0);
-	else ret.setGreenF(g());
-
-	if(b()<0) ret.setBlue(0);
-	else if(b()>1) ret.setBlueF(1.0);
-	else ret.setBlueF(b());
-	return ret;
 }

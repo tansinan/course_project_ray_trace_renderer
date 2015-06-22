@@ -150,6 +150,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="RTRCamera.cpp" />
+    <ClCompile Include="RTRColor.cpp" />
     <ClCompile Include="RTRGeometry.cpp" />
     <ClCompile Include="RTRKdTree.cpp" />
     <ClCompile Include="Light\RTRLightPoint.cpp" />
@@ -183,6 +184,7 @@ endlocal
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="RTRCamera.h" />
+    <ClInclude Include="RTRColor.h" />
     <ClInclude Include="RTRGeometry.h" />
     <ClInclude Include="RTRKdTree.h" />
     <ClInclude Include="Light\RTRLightAbstract.h" />

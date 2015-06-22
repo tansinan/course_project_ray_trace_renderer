@@ -155,7 +155,7 @@ void RTRRenderer::renderLineByDDA(RTRVector p1, RTRVector p2, const QColor &colo
 RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTRRenderElement* elementFrom)
 {
 	//RTRVector* vec3D = new RTRVector(3)[100];
-	RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRVector(1,1,1),7.5);
+	RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRColor(1,1,1),7.5);
 	QColor myBlue;
 	myBlue.setRedF(0.5);
 	myBlue.setGreenF(0.5);
@@ -222,7 +222,7 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 			int a = 0;
 			a++;
 		}
-		qDebug() << reflectionColor.r() << reflectionColor.g() << reflectionColor.b();
+		//qDebug() << reflectionColor.r() << reflectionColor.g() << reflectionColor.b();
 		return reflectionColor*0.5 + diffuseColor*0.5;
 	}
 	else

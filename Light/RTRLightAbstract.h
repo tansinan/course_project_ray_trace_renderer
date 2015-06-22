@@ -2,7 +2,7 @@
 #define RTRLIGHTSOURCE_H
 
 #include "RTRGeometry.h"
-#include <QColor>
+#include "RTRColor.h"
 
 class RTRLightAbstract
 {
