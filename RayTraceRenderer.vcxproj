@@ -159,10 +159,14 @@
     <ClCompile Include="RTRModel.cpp" />
     <ClCompile Include="RTRRenderElement.cpp" />
     <ClCompile Include="RTRRenderer.cpp" />
+    <ClCompile Include="RTRVector2D.cpp" />
+    <ClCompile Include="RTRVector3D.cpp" />
     <ClCompile Include="RTRViewer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RTRVector2D.h" />
+    <ClInclude Include="RTRVector3D.h" />
     <CustomBuild Include="MainWindow.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
@@ -192,6 +196,8 @@ endlocal
     <ClInclude Include="RTRMaterial.h" />
     <ClInclude Include="RTRMatrix.h" />
     <ClInclude Include="RTRModel.h" />
+    <ClInclude Include="RTRModelObject.h" />
+    <ClInclude Include="RTRModelVertex.h" />
     <ClInclude Include="RTRRenderElement.h" />
     <ClInclude Include="RTRRenderer.h" />
     <CustomBuild Include="RTRViewer.h">

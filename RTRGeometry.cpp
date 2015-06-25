@@ -2,14 +2,14 @@
 #include <qmath.h>
 #include <cmath>
 
-RTRPlane::RTRPlane(RTRVector _onePoint, RTRVector _normal)
+RTRPlane::RTRPlane(RTRVector3D _onePoint, RTRVector3D _normal)
 {
 	onePoint = _onePoint;
 	normal = _normal;
 	normal.vectorNormalize();
 }
 
-RTRSegment::RTRSegment(RTRVector param1, RTRVector param2, int createMode)
+RTRSegment::RTRSegment(RTRVector3D param1, RTRVector3D param2, int createMode)
 {
 	switch(createMode)
 	{
@@ -36,7 +36,7 @@ RTRVector3D RTRSegment::pointAt(int coordinate, double val) const
 	return ret;
 }
 
-RTRSegment2D::RTRSegment2D(const RTRVector &param1, const RTRVector& param2, int createMode)
+RTRSegment2D::RTRSegment2D(const RTRVector2D &param1, const RTRVector2D& param2, int createMode)
 {
 	Q_ASSERT(param1.isVector()&&param1.getSize()==2);
 	Q_ASSERT(param2.isVector()&&param2.getSize()==2);
@@ -67,7 +67,7 @@ RTRSegment2D::RTRSegment2D(const RTRVector &param1, const RTRVector& param2, int
 	intersectX = beginningPoint.x() - slopeX * beginningPoint.y();
 }
 
-void RTRSegment2D::reset(const RTRVector &param1, const RTRVector& param2, int createMode)
+void RTRSegment2D::reset(const RTRVector2D &param1, const RTRVector2D& param2, int createMode)
 {
 	Q_ASSERT(param1.isVector()&&param1.getSize()==2);
 	Q_ASSERT(param2.isVector()&&param2.getSize()==2);
@@ -108,15 +108,15 @@ int RTRSegment2D::pointSign(const RTRVector2D& point) const
 	else return point.x() > intersectX ? 1 : -1;
 }
 
-RTRTriangle3D::RTRTriangle3D(const RTRVector& vert1, const RTRVector& vert2, const RTRVector& vert3)
-	:plane(vert1, (vert3-vert1).crossProduct(vert2-vert1))
+RTRTriangle3D::RTRTriangle3D(const RTRVector3D& vert1, const RTRVector3D& vert2, const RTRVector3D& vert3)
+	:plane(vert1, RTRVector3D(vert3-vert1).crossProduct(vert2-vert1))
 {
 	vertices[0] = vert1;
 	vertices[1] = vert2;
 	vertices[2] = vert3;
 }
 
-RTRTriangle2D::RTRTriangle2D(const RTRVector& vert1, const RTRVector& vert2, const RTRVector& vert3)
+RTRTriangle2D::RTRTriangle2D(const RTRVector2D& vert1, const RTRVector2D& vert2, const RTRVector2D& vert3)
 	//:edges(vert1,vert2,RTRSegment2D::CREATE_FROM_POINTS)
 	/*:edges{{vert1,vert2,RTRSegment2D::CREATE_FROM_POINTS},
 {vert2,vert3,RTRSegment2D::CREATE_FROM_POINTS},
@@ -139,7 +139,7 @@ RTRTriangle2D::RTRTriangle2D(const RTRVector& vert1, const RTRVector& vert2, con
 
 //以下为几何解算模块的代码。
 
-RTRVector RTRGeometry::intersect(const RTRPlane& plane, const RTRSegment& segment)
+RTRVector3D RTRGeometry::intersect(const RTRPlane& plane, const RTRSegment& segment)
 {
 	double ratio = 0.0;
 	double d1 = distance(segment.beginningPoint,plane);
@@ -148,7 +148,7 @@ RTRVector RTRGeometry::intersect(const RTRPlane& plane, const RTRSegment& segmen
 	return segment.beginningPoint + (segment.endPoint-segment.beginningPoint) * ratio;
 }
 
-RTRVector RTRGeometry::project(const RTRVector &point, const RTRCamera &camera)
+RTRVector2D RTRGeometry::project(const RTRVector &point, const RTRCamera &camera)
 {
 	return camera.transformPoint(point);
 }

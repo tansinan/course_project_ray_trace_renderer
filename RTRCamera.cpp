@@ -37,10 +37,10 @@ void RTRCamera::evaluateRotationMatrix()
 	rotationMatrix = rotateX*rotateY*rotateZ;*/
 }
 
-RTRVector RTRCamera::transformPoint(RTRVector point) const
+RTRVector RTRCamera::transformPoint(RTRVector3D point) const
 {
-	RTRVector ret(2);
-	RTRVector relativePosition = rotationMatrix*(point-cameraPosition);
+	RTRVector2D ret(2);
+	RTRVector3D relativePosition = rotationMatrix*(point-cameraPosition);
 	//rotationMatrix.printDebugInfo();
 	//qDebug() << ret.x() << ret.y() << ret.z();
 	ret.x() = - relativePosition.x()/relativePosition.z()*focalLength;
@@ -49,11 +49,11 @@ RTRVector RTRCamera::transformPoint(RTRVector point) const
 	return ret;
 }
 
-RTRSegment RTRCamera::inverseProject(RTRVector point) const
+RTRSegment RTRCamera::inverseProject(RTRVector3D point) const
 {
 	point = point - offset;
 	//RTRVector point1(point.x()/focalLength,point.y()/focalLength,-1);
-	RTRVector point2(point.x(),point.y(),-focalLength);
+	RTRVector3D point2(point.x(),point.y(),-focalLength);
 	//point1 = inverseRotationMatrix * point1;
 	point2 = inverseRotationMatrix * point2;
 	point2 = point2 + cameraPosition;

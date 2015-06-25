@@ -285,7 +285,7 @@ double RTRMatrix::vectorLengthSquared() const
 	}
 	return ret;
 }
-
+/*
 double& RTRMatrix::x()
 {
 	Q_ASSERT(isVector()&&size>=1);
@@ -321,16 +321,8 @@ double RTRMatrix::z() const
 	Q_ASSERT(isVector()&&size>=3);
 	return data[2];
 }
+*/
 
-RTRMatrix RTRVector::crossProduct(const RTRMatrix& other) const
-{
-	Q_ASSERT(isVector()&&size==3&&other.isVector()&&other.size==3);
-	RTRVector ret(3);
-	ret.x() = y()*other.z()-z()*other.y();
-	ret.y() = z()*other.x()-x()*other.z();
-	ret.z() = x()*other.y()-y()*other.x();
-	return ret;
-}
 
 double RTRVector::dotProduct(const RTRMatrix &other) const
 {

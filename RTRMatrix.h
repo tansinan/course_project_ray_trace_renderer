@@ -50,14 +50,13 @@ public:
 	bool vectorNormalize();
 	double vectorLength() const;
 	double vectorLengthSquared() const;
-	RTRMatrix crossProduct(const RTRMatrix &other) const;
 	double dotProduct(const RTRMatrix& other) const;
-	double& x();
+	/*double& x();
 	double x() const;
 	double& y();
 	double y() const;
 	double& z();
-	double z() const;
+	double z() const;*/
 	void printDebugInfo() const
 	{
 		cout << "[" <<endl;
@@ -74,8 +73,8 @@ public:
 };
 
 typedef RTRMatrix RTRVector;
-typedef RTRMatrix RTRVector2D;
-typedef RTRMatrix RTRVector3D;
+//typedef RTRMatrix RTRVector2D;
+//typedef RTRMatrix RTRVector3D;
 /*typedef RTRMatrix RTRColor;
 typedef RTRMatrix RTRColorRGB;
 typedef RTRMatrix RTRColorRGBA;*/

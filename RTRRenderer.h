@@ -23,7 +23,7 @@ public:
 	void render();
 	void renderPixel(int x, int y, double z, const RTRColor &color);
 	void renderLineByDDA(int x1, int y1, int x2, int y2, const QColor &color);
-	void renderLineByDDA(RTRVector p1, RTRVector p2, const QColor &color);
+	void renderLineByDDA(RTRVector2D p1, RTRVector2D p2, const QColor &color);
 	void renderTriangle(const RTRTriangle3D& triangle, const RTRMaterial& material);
 
 	/**

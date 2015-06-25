@@ -4,6 +4,8 @@
 #include <QVector>
 #include <QString>
 #include "RTRMatrix.h"
+#include "RTRVector2D.h"
+#include "RTRVector3D.h"
 
 class QPointF;
 class QImage;
@@ -14,6 +16,8 @@ class RTRFace
 public:
 	QString objectName;
 	QList<int> vertices;
+	QList<int> normals;
+	QList<int> uvCoordinates;
 	void addVertex(int vertex)
 	{
 		vertices.append(vertex);
@@ -23,7 +27,9 @@ public:
 class RTRModel
 {
 public:
-	QVector<RTRVector> vertices;
+	QVector<RTRVector3D> vertexPositions;
+	QVector<RTRVector3D> vertexNormals;
+	QVector<RTRVector2D> vertexUVPositions;
 	QVector<RTRFace> faces;
 public:
 	bool loadModelFromObjFile(QString filePath);

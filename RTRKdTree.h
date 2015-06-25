@@ -29,7 +29,7 @@ protected:
 
 protected:
 	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment) const;
-	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0);
+	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0, int maxDepth = 20);
 
 public:
 	static RTRKdTree* create(const QVector<RTRRenderElement*>& elementTable);

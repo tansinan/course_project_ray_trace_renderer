@@ -88,6 +88,12 @@
     <ClCompile Include="RTRColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RTRVector3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTRVector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -129,6 +135,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RTRColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRModelObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRModelVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRVector3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRVector2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

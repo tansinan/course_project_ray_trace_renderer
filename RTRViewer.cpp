@@ -8,7 +8,7 @@
 RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
-	model->loadModelFromObjFile(QString("D:\\Documents\\SimpleGlass.obj"));
+	model->loadModelFromObjFile(QString("D:\\Documents\\sphere.obj"));
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
 }
@@ -38,7 +38,7 @@ void RTRViewer::paintEvent(QPaintEvent* event)
 	//camera.cameraAngle = RTRVector(0, 0, 0);
 	camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
 	//camera.cameraPosition = RTRVector(0, 0, 0);
-	camera.focalLength = 750;
+	camera.focalLength = 1500;
 	camera.offset.x() = 400;
 	camera.offset.y() = 300;
 	//camera.focalLength = 500;

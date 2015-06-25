@@ -6,7 +6,7 @@ RTRKdTree::RTRKdTree()
 }
 
 
-void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth)
+void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth, int maxDepth)
 {
 	//Thrink the size first
 	RTRBoundingBox boundingBox;
@@ -38,7 +38,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 		}
 	}
 
-	if (elementTable.size() <= 2 || depth >= 20)
+	if (elementTable.size() <= 2 || depth >= maxDepth)
 	{
 		parent->small = parent->large = NULL;
 		parent->splitMethod = Node::SPLIT_NONE;
@@ -114,7 +114,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 
 	if (minDuplicate / (double)elementTable.size() > 0.6)
 	{
-		depth = 100;
+		depth = maxDepth + 1;
 	}
 	Node* nodeSmall = new Node();
 	Node* nodeLarge = new Node();
@@ -124,12 +124,13 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 	nodeSmall->boundingBox.point2(splitMethod) = bestMid;
 	nodeLarge->boundingBox.point1(splitMethod) = bestMid;
 	//nodeSmall->splitMethod = nodeLarge->splitMethod = (parent->splitMethod+1) % 3;
-	construct(nodeSmall, bestNewTableSmall, depth + 1);
-	construct(nodeLarge, bestNewTableLarge, depth + 1);
+	construct(nodeSmall, bestNewTableSmall, depth + 1, maxDepth);
+	construct(nodeLarge, bestNewTableLarge, depth + 1, maxDepth);
 }
 
 RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 {
+	int maxDepth = log2(elementTable.size()) + 3;
 	RTRKdTree* ret = new RTRKdTree();
 	if (elementTable.size() == 0) return NULL;
 	RTRBoundingBox boundingBox;
@@ -156,7 +157,7 @@ RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 	ret->root = new Node();
 	ret->root->boundingBox = boundingBox;
 	ret->root->splitMethod = Node::SPLIT_BY_X;
-	construct(ret->root, elementTable);
+	construct(ret->root, elementTable, 0, maxDepth);
 	return ret;
 }
 

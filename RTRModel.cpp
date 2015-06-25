@@ -2,10 +2,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <QPointF>
-#include <QVector3D>
 #include <QImage>
 #include <QColor>
+#include "RTRGeometry.h"
 
 RTRModel::RTRModel()
 {
@@ -28,55 +27,70 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 	QString currentObjectName = "";
 	while(!objModelStream.atEnd())
 	{
-		QString str = objModelStream.readLine();
-		if(str[0]=='#')
+		QString line = objModelStream.readLine().trimmed();
+		if (line.isEmpty()) continue;
+		if(line[0]=='#')
 		{
-			qDebug() << "Ignoring Comment Line:" << str;
+			qDebug() << "Ignoring Comment Line:" << line;
+			continue;
 		}
-		else if(str.startsWith("mtllib "))
+		QStringList param = line.split(' ', QString::SkipEmptyParts);
+		QString command = param[0];
+		command.toLower();
+		param.removeFirst();
+		if (command == "o")
 		{
-			qDebug() << "Ignoring Unsupported Feature : Matrial Library" << str;
-		}
-		else if(str.startsWith("o "))
-		{
-			str[0] = ' ';
-			currentObjectName = str.trimmed();
+			currentObjectName = param[0];
 			//qDebug() << "Ignoring Unsupported Feature : Object" << objectName;
 		}
-		else if(str.startsWith("usemtl "))
+		else if (command == "s")
 		{
-			qDebug() << "Ignoring Unsupported Feature : Use Material" << str;
+			//TODO : Smooth Shading Support 
 		}
-		else if(str.startsWith("s "))
+		else if (command == "v")
 		{
-			qDebug() << "Ignoring Unsupported Feature : S(Shading?)" << str;
-		}
-		else if(str.startsWith("v "))
-		{
-			double x,y,z;
-			QTextStream parser(&str);
-			parser.seek(2);
-			parser >> x >> y >> z;
-			vertices.append(RTRVector(x,y,z));
+			//TODO : Different Type Of Vertex Support
+			vertexPositions.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
 			//rrqDebug() << "Vertex Loaded" << x<<y<<z;
 		}
-		else if(str.startsWith("f "))
+		else if (command == "vn")
+		{
+			vertexNormals.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			vertexNormals.back().vectorNormalize();
+		}
+		else if (command == "vt")
+		{
+			vertexUVPositions.append(RTRVector2D(param[0].toDouble(), param[1].toDouble()));
+		}
+		else if (command == "f")
 		{
 			RTRFace face;
-			face.objectName = currentObjectName;
-			int point;
-			QTextStream parser(&str);
-			parser.seek(2);
-			while(!parser.atEnd())
+			for (int i = 0; i < param.size(); i++)
 			{
-				parser >> point;
-				face.addVertex(point);
+				QStringList list = param[i].split("/");
+				switch (list.size())
+				{
+				case 1:
+					face.addVertex(list[0].toInt());
+					break;
+				case 2:
+					face.addVertex(list[0].toInt());
+					face.uvCoordinates.append(list[1].toInt());
+					break;
+				case 3:
+					face.addVertex(list[0].toInt());
+					if(!list[1].isEmpty()) face.uvCoordinates.append(list[1].toInt());
+					face.normals.append(list[2].toInt());
+					break;
+				default:
+					break;
+				}
 			}
 			faces.append(face);
 		}
 		else
 		{
-			qDebug() << "Ignoring Unsupported Line : " << str;
+			qDebug() << "Ignoring Unsupported Line : " << command << param;
 		}
 	}
 	objModelFile.close();
@@ -85,7 +99,7 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 
 void RTRModel::renderToImage(QImage* image)
 {
-	for(int i=0;i<faces.size();i++)
+	/*for(int i=0;i<faces.size();i++)
 	{
 		RTRFace& face = faces[i];
 		for(int j=0;j<face.vertices.size();j++)
@@ -107,7 +121,7 @@ void RTRModel::renderToImage(QImage* image)
 						  200 + point2.y()*100 + point2.z()*50,
 						  QColor(255,0,0));
 		}
-	}
+	}*/
 }
 
 void RTRModel::drawLineByDDA(QImage* image, int x1, int y1, int x2, int y2, const QColor &color)

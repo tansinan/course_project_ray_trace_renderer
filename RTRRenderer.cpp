@@ -44,14 +44,14 @@ void RTRRenderer::render()
 		RTRVector point1(3), point2(3), point3(3);
 
 		//将多边形的第一个顶点作为三角形的第一个顶m点
-		point1 = model->vertices[face.vertices[0]-1];
+		point1 = model->vertexPositions[face.vertices[0]-1];
 
 		//而三角形的另外两个顶点从多边形剩下的顶点中取两两相邻的选取。
 		for(int j=1;j<face.vertices.size()-1;j++)
 		{
 			//构建新的三角形
-			point2 = model->vertices[face.vertices[j]-1];
-			point3 = model->vertices[face.vertices[j+1]-1];
+			point2 = model->vertexPositions[face.vertices[j] - 1];
+			point3 = model->vertexPositions[face.vertices[j + 1] - 1];
 
 			QColor myBlue;
 			myBlue.setRedF(0.5);
@@ -146,7 +146,7 @@ void RTRRenderer::renderLineByDDA(int x1, int y1, int x2, int y2, const QColor &
 	}
 }
 
-void RTRRenderer::renderLineByDDA(RTRVector p1, RTRVector p2, const QColor &color)
+void RTRRenderer::renderLineByDDA(RTRVector2D p1, RTRVector2D p2, const QColor &color)
 {
 	renderLineByDDA(p1.x(), p1.y(), p2.x(), p2.y(), color);
 }
@@ -211,7 +211,7 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	}
 
 	RTRColor reflectionColor(1.0,0.0,0.0);
-	if (frontElement != NULL && frontElement->objectName == "Cube_Cube.001" && iterationCount<2)
+	if (frontElement != NULL && frontElement->objectName == "Torus" && iterationCount<2)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
