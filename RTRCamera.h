@@ -31,7 +31,7 @@ public:
 	/**
 	* @brief offset是一个二维向量，表示图像的位置偏移,offset与透视效应无关。
 	*/
-	RTRVector3D offset;
+	RTRVector2D offset;
 	RTRCamera();
 public:
 
@@ -64,7 +64,7 @@ public:
 	* @param point
 	* @return
 	*/
-	RTRSegment inverseProject(RTRVector3D point) const;
+	RTRSegment inverseProject(RTRVector2D point) const;
 };
 
 #endif // RTRCAMERA_H

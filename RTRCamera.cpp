@@ -3,10 +3,10 @@
 #include <QDebug>
 
 RTRCamera::RTRCamera()
-	:cameraAngle(3)
-	,cameraPosition(3)
+	:cameraAngle()
+	,cameraPosition()
 	,rotationMatrix(3,3)
-	,offset(2)
+	,offset()
 {
 
 }
@@ -49,7 +49,7 @@ RTRVector RTRCamera::transformPoint(RTRVector3D point) const
 	return ret;
 }
 
-RTRSegment RTRCamera::inverseProject(RTRVector3D point) const
+RTRSegment RTRCamera::inverseProject(RTRVector2D point) const
 {
 	point = point - offset;
 	//RTRVector point1(point.x()/focalLength,point.y()/focalLength,-1);

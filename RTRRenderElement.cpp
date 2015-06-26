@@ -78,7 +78,6 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const
 {
 	result = RTRGeometry::intersect(triangle3D->plane, ray);
-	normal = triangle3D->plane.normal;
 	RTRVector2D temp(2);
 	bool ret = true;
 	if (orthProjectDirection == 0)
@@ -100,6 +99,34 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
 	}
 	if (!ret) return false;
+	if (useSmoothShading)
+	{
+		double a1, a2, a3;
+		RTRVector3D line12 = triangle3D->vertices[1] - triangle3D->vertices[0];
+		RTRVector3D line13 = triangle3D->vertices[2] - triangle3D->vertices[0];
+		RTRVector3D line1p = result - triangle3D->vertices[0];
+		double det = line13.x() * line12.y() - line12.x() * line13.y();
+		//TODO
+		a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
+		a2 = abs(a2 / det);
+		a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
+		a3 = abs(a3 / det);
+		a1 = 1 - a2 - a3;
+		if (det == 0)
+		{
+			det = line13.y() * line12.z() - line12.y() * line13.z();
+			a2 = line1p.y() * line13.z() - line13.y() * line1p.z();
+			a2 = abs(a2 / det);
+			a3 = line1p.y() * line12.z() - line12.y() * line1p.z();
+			a3 = abs(a3 / det);
+			a1 = 1 - a2 - a3;
+		}
+		normal = vertexNormals[0] * a1 + vertexNormals[1] * a2 + vertexNormals[2] * a3;
+	}
+	else
+	{
+		normal = triangle3D->plane.normal;
+	}
 	if (objectName != "Plane")
 	{
 		color.r() = color.g() = color.b() = 1.0;

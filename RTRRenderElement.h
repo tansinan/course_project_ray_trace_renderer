@@ -10,8 +10,8 @@ class RTRRenderElement
 protected:
 	int orthProjectDirection;
 	RTRTriangle2D* orthProjectTriangle;
-	RTRVector3D vertexNormals[3];
 public:
+	bool useSmoothShading;
 	RTRRenderElement();
 	RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera);
 	RTRTriangle3D* triangle3D;

@@ -64,9 +64,20 @@ void RTRRenderer::render()
 			//TODO: 存在内存泄漏问题！
 			RTRRenderElement* element = new RTRRenderElement(new RTRTriangle3D(point1, point2, point3), camera);
 			element->objectName = face.objectName;
-			//element->triangle3D = new RTRTriangle3D(point1, point2, point3);
-			//element->triangle2D = new RTRTriangle2D(RTRGeometry::project(*element->triangle3D, *camera));
 			element->material = &material;
+			if (model->vertexNormals.size() > face.normals[j + 1] - 1 &&
+				model->vertexNormals.size() > face.normals[j] - 1 &&
+				model->vertexNormals.size() > face.normals[0] - 1)
+			{
+				element->useSmoothShading = true;
+				element->vertexNormals[0] = model->vertexNormals[face.normals[0] - 1];
+				element->vertexNormals[1] = model->vertexNormals[face.normals[j] - 1];
+				element->vertexNormals[2] = model->vertexNormals[face.normals[j + 1] - 1];
+			}
+			else
+			{
+				element->useSmoothShading = false;
+			}
 
 			//将三角形添加到需要渲染的三角形的列表之中
 			elements.append(element);
