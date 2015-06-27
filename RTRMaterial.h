@@ -2,6 +2,10 @@
 #define RTRMATERIAL_H
 
 #include <QColor>
+#include <QMap>
+#include "RTRColor.h"
+
+class RTRTexture;
 
 /**
  * @brief RTRMaterial类定义了物体的一个表面材质
@@ -9,6 +13,8 @@
 class RTRMaterial
 {
 public:
+	QMap<QString, RTRColor> colorProperties;
+	QMap<QString, RTRTexture*> textureProperties;
 	/**
 	 * @brief diffuse表示物体的漫反射颜色。
 	 */
@@ -20,6 +26,10 @@ public:
 	QColor specular;
 public:
 	RTRMaterial(const QColor &_diffuse, const QColor& _specular);
+	RTRMaterial();
+	void setColorProperty(const QString& propertyName, const RTRColor& color);
+	void setTextureProperty(const QString& propertyName, const QString& textureFilePath);
+	RTRColor getColorAt(const QString& propertyName, double u, double v);
 signals:
 
 public slots:

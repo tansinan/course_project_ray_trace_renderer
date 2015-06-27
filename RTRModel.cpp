@@ -4,7 +4,10 @@
 #include <QDebug>
 #include <QImage>
 #include <QColor>
+#include <QDir>
+#include <QFileInfo>
 #include "RTRGeometry.h"
+#include "RTRTexture.h"
 
 RTRModel::RTRModel()
 {
@@ -16,8 +19,10 @@ RTRModel::~RTRModel()
 
 }
 
-bool RTRModel::loadModelFromObjFile(QString filePath)
+bool RTRModel::loadModelFromObjFile(const QString& filePath)
 {
+	QFileInfo info(filePath);
+	modelPath = info.dir().path();
 	QFile objModelFile(filePath);
 	if(!objModelFile.open(QIODevice::ReadOnly))
 	{
@@ -25,6 +30,8 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 	}
 	QTextStream objModelStream(&objModelFile);
 	QString currentObjectName = "";
+	QString currentGroupName = "";
+	QString materialName = "";
 	while(!objModelStream.atEnd())
 	{
 		QString line = objModelStream.readLine().trimmed();
@@ -38,10 +45,22 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 		QString command = param[0];
 		command.toLower();
 		param.removeFirst();
-		if (command == "o")
+		if (command == "mtllib")
+		{
+			loadMaterialLibraryFromMtlFile(modelPath + "/" + param[0]);
+		}
+		else if (command == "usemtl")
+		{
+			materialName = param[0];
+		}
+		else if (command == "o")
 		{
 			currentObjectName = param[0];
 			//qDebug() << "Ignoring Unsupported Feature : Object" << objectName;
+		}
+		else if (command == "g")
+		{
+			currentGroupName = param[0];
 		}
 		else if (command == "s")
 		{
@@ -49,9 +68,7 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 		}
 		else if (command == "v")
 		{
-			//TODO : Different Type Of Vertex Support
 			vertexPositions.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			//rrqDebug() << "Vertex Loaded" << x<<y<<z;
 		}
 		else if (command == "vn")
 		{
@@ -65,6 +82,9 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 		else if (command == "f")
 		{
 			RTRFace face;
+			face.objectName = currentObjectName;
+			face.groupName = currentGroupName;
+			face.materialName = materialName;
 			for (int i = 0; i < param.size(); i++)
 			{
 				QStringList list = param[i].split("/");
@@ -97,68 +117,55 @@ bool RTRModel::loadModelFromObjFile(QString filePath)
 	return true;
 }
 
-void RTRModel::renderToImage(QImage* image)
+bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 {
-	/*for(int i=0;i<faces.size();i++)
+	QFile mtlFile(filePath);
+	if (!mtlFile.open(QIODevice::ReadOnly))
 	{
-		RTRFace& face = faces[i];
-		for(int j=0;j<face.vertices.size();j++)
-		{
-			RTRVector point1(3), point2(3);
-			point1 = vertices[face.vertices[j]-1];
-			if(j==face.vertices.size()-1)
-			{
-				point2 = vertices[face.vertices[0]-1];
-			}
-			else
-			{
-				point2 = vertices[face.vertices[j+1]-1];
-			}
-
-			drawLineByDDA(image, 200 + point1.x()*100 + point1.z()*50,
-						  200 + point1.y()*100+ point1.z()*50,
-						  200 + point2.x()*100 + point2.z()*50,
-						  200 + point2.y()*100 + point2.z()*50,
-						  QColor(255,0,0));
-		}
-	}*/
-}
-
-void RTRModel::drawLineByDDA(QImage* image, int x1, int y1, int x2, int y2, const QColor &color)
-{
-	//This improved DDA Alogrithm handles x1/x2 in reverse order,
-	//or \Delta Y>\Delta X cases.
-	//Note: about the 0.5 problem: using qRound Function
-	int deltaX = qAbs(x1 - x2);
-	int deltaY = qAbs(y1 - y2);
-	if (deltaX > deltaY)
+		return false;
+	}
+	QTextStream mtlFileStream(&mtlFile);
+	QString currentMaterialName;
+	RTRMaterial* currentMaterial = NULL;
+	while (!mtlFileStream.atEnd())
 	{
-		if(x1 > x2)
+		QString line = mtlFileStream.readLine().trimmed();
+		if (line.isEmpty()) continue;
+		if (line[0] == '#')
 		{
-			qSwap(x1,x2);
-			qSwap(y1,y2);
+			qDebug() << "Ignoring Comment Line:" << line;
+			continue;
 		}
-		double slope = ((double)(y2-y1))/(x2-x1);
-		double y = y1;
-		for(int x = x1; x <= x2; x++, y += slope)
+		QStringList param = line.split(' ', QString::SkipEmptyParts);
+		QString command = param[0];
+		command = command.toLower();
+		param.removeFirst();
+		if (command == "newmtl")
 		{
-			if(x>=0 && x<image->width() && y>=0 && y<image->height())
-				image->setPixel(x, qRound(y), color.rgb());
+			if (currentMaterial != NULL)
+			{
+				materialLibrary.insert(currentMaterialName, currentMaterial);
+			}
+			currentMaterialName = param[0];
+			currentMaterial = new RTRMaterial();
+		}
+		else
+		{
+			if (currentMaterial == NULL)
+			{
+				mtlFile.close();
+				return false;
+			}
+			if (command == "kd")
+				currentMaterial->setColorProperty("diffuse", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			else if (command == "map_kd")
+				currentMaterial->setTextureProperty("diffuse", modelPath + "/" + param[0]);
 		}
 	}
-	else
+	if (currentMaterial != NULL)
 	{
-		if(y1 > y2)
-		{
-			qSwap(x1,x2);
-			qSwap(y1,y2);
-		}
-		double slope = ((double)(x2-x1))/(y2-y1);
-		double x = x1;
-		for(int y = y1; y <= y2; y++, x += slope)
-		{
-			if(x>=0 && x<image->width() && y>=0 && y<image->height())
-				image->setPixel(qRound(x), y, color.rgb());
-		}
+		materialLibrary.insert(currentMaterialName, currentMaterial);
 	}
+	mtlFile.close();
+	return true;
 }

@@ -6,6 +6,7 @@
 #include "RTRMatrix.h"
 #include "RTRVector2D.h"
 #include "RTRVector3D.h"
+#include "RTRMaterial.h"
 
 class QPointF;
 class QImage;
@@ -15,6 +16,8 @@ class RTRFace
 {
 public:
 	QString objectName;
+	QString groupName;
+	QString materialName;
 	QList<int> vertices;
 	QList<int> normals;
 	QList<int> uvCoordinates;
@@ -31,12 +34,13 @@ public:
 	QVector<RTRVector3D> vertexNormals;
 	QVector<RTRVector2D> vertexUVPositions;
 	QVector<RTRFace> faces;
+	QMap<QString, RTRMaterial*> materialLibrary;
+	QString modelPath;
 public:
-	bool loadModelFromObjFile(QString filePath);
+	bool loadModelFromObjFile(const QString& filePath);
+	bool loadMaterialLibraryFromMtlFile(const QString& filePath);
 	RTRModel();
 	~RTRModel();
-	void renderToImage(QImage* image);
-	void drawLineByDDA(QImage* image, int x1, int y1, int x2, int y2, const QColor &color);
 };
 
 #endif // RTRMODEL_H

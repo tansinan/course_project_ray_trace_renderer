@@ -15,6 +15,7 @@ RTRColor::RTRColor(double _r, double _g, double _b)
 	r() = _r;
 	g() = _g;
 	b() = _b;
+	a() = 1.0;
 }
 
 RTRColor::RTRColor(const RTRMatrix& matrix)

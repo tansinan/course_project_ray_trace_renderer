@@ -12,6 +12,7 @@ const RTRBoundingBox& RTRRenderElement::getBoundingBox() const
 
 RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera)
 {
+	material = NULL;
 	triangle3D = _triangle3D;
 	triangle2D = new RTRTriangle2D(RTRGeometry::project(*triangle3D, *camera));
 	for (int i = 0; i < 3; i++)
@@ -105,19 +106,31 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		RTRVector3D line12 = triangle3D->vertices[1] - triangle3D->vertices[0];
 		RTRVector3D line13 = triangle3D->vertices[2] - triangle3D->vertices[0];
 		RTRVector3D line1p = result - triangle3D->vertices[0];
-		double det = line13.x() * line12.y() - line12.x() * line13.y();
-		//TODO
-		a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
-		a2 = abs(a2 / det);
-		a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
-		a3 = abs(a3 / det);
-		a1 = 1 - a2 - a3;
-		if (det == 0)
+
+		if (orthProjectDirection == 0)
 		{
-			det = line13.y() * line12.z() - line12.y() * line13.z();
+			double det = line13.y() * line12.z() - line12.y() * line13.z();
 			a2 = line1p.y() * line13.z() - line13.y() * line1p.z();
 			a2 = abs(a2 / det);
 			a3 = line1p.y() * line12.z() - line12.y() * line1p.z();
+			a3 = abs(a3 / det);
+			a1 = 1 - a2 - a3;
+		}
+		else if (orthProjectDirection == 1)
+		{
+			double det = line13.x() * line12.z() - line12.x() * line13.z();
+			a2 = line1p.x() * line13.z() - line13.x() * line1p.z();
+			a2 = abs(a2 / det);
+			a3 = line1p.x() * line12.z() - line12.x() * line1p.z();
+			a3 = abs(a3 / det);
+			a1 = 1 - a2 - a3;
+		}
+		else if (orthProjectDirection == 2)
+		{
+			double det = line13.x() * line12.y() - line12.x() * line13.y();
+			a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
+			a2 = abs(a2 / det);
+			a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
 			a3 = abs(a3 / det);
 			a1 = 1 - a2 - a3;
 		}
@@ -129,7 +142,11 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 	}
 	if (objectName != "Plane")
 	{
-		color.r() = color.g() = color.b() = 1.0;
+		if (material != NULL)
+		{
+			color = material->getColorAt("diffuse", 0, 0);
+		}
+		else color.r() = color.g() = color.b() = 1.0;
 	}
 	else
 	{

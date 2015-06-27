@@ -78,6 +78,11 @@ void RTRRenderer::render()
 			{
 				element->useSmoothShading = false;
 			}
+			if (face.materialName == "") element->material = NULL;
+			else
+			{
+				element->material = model->materialLibrary[face.materialName];
+			}
 
 			//将三角形添加到需要渲染的三角形的列表之中
 			elements.append(element);
@@ -222,18 +227,12 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	}
 
 	RTRColor reflectionColor(1.0,0.0,0.0);
-	if (frontElement != NULL && frontElement->objectName == "Torus" && iterationCount<2)
+	if (frontElement != NULL /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<4)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
 		RTRRay reflectionRay(intersectPoint,reflectionDirection,RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
 		reflectionColor = renderRay(reflectionRay, iterationCount + 1, frontElement);
-		if (reflectionColor.r() >= 0.999&&reflectionColor.g() >= 0.999&&reflectionColor.b() >= 0.999)
-		{
-			int a = 0;
-			a++;
-		}
-		//qDebug() << reflectionColor.r() << reflectionColor.g() << reflectionColor.b();
 		return reflectionColor*0.5 + diffuseColor*0.5;
 	}
 	else
