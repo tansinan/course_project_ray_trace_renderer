@@ -28,12 +28,13 @@ protected:
 	RTRKdTree();
 
 protected:
-	void search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment) const;
+	void search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
+		RTRRay& originalRay, double& minZ, const RTRRenderElement* elementFrom) const;
 	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0, int maxDepth = 20);
 
 public:
 	static RTRKdTree* create(const QVector<RTRRenderElement*>& elementTable);
-	void search(QSet<RTRRenderElement*>& searchResult, const RTRSegment& segment) const;
+	void search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const;
 
 
 };

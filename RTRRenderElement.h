@@ -21,6 +21,7 @@ public:
 	RTRVector3D vertexNormals[3];
 	virtual const RTRBoundingBox& getBoundingBox() const;
 	virtual bool intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const;
+	virtual bool intersect(const RTRRay& ray, RTRVector3D& result);
 	QString objectName;
 	//virtual const RTRVector3D& getCentroid() const;
 };

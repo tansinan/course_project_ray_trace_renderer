@@ -140,7 +140,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 	{
 		normal = triangle3D->plane.normal;
 	}
-	if (objectName != "Plane")
+	//if (objectName != "Plane")
 	{
 		if (material != NULL)
 		{
@@ -148,7 +148,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		}
 		else color.r() = color.g() = color.b() = 1.0;
 	}
-	else
+	/*else
 	{
 		int x = qRound(result.x());
 		int y = qRound(result.y());
@@ -160,6 +160,33 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		{
 			color.r() = color.g() = color.b() = 0.75;
 		}
-	}
+	}*/
 	return ret;
+}
+
+bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result)
+{
+	result = RTRGeometry::intersect(triangle3D->plane, ray);
+	RTRVector2D temp(2);
+	bool ret = true;
+	if (orthProjectDirection == 0)
+	{
+		temp.x() = result.y();
+		temp.y() = result.z();
+		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
+	}
+	else if (orthProjectDirection == 1)
+	{
+		temp.x() = result.x();
+		temp.y() = result.z();
+		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
+	}
+	if (orthProjectDirection == 2)
+	{
+		temp.x() = result.x();
+		temp.y() = result.y();
+		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
+	}
+	if (!ret) return false;
+	else return true;
 }
