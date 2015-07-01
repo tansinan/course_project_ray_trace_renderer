@@ -7,38 +7,29 @@
 #include "RTRVector2D.h"
 #include "RTRVector3D.h"
 #include "RTRMaterial.h"
+#include "RTRModelVertex.h"
+#include "RTRModelPolygen.h"
 
 class QPointF;
 class QImage;
 class QColor;
 
-class RTRFace
-{
-public:
-	QString objectName;
-	QString groupName;
-	QString materialName;
-	QList<int> vertices;
-	QList<int> normals;
-	QList<int> uvCoordinates;
-	void addVertex(int vertex)
-	{
-		vertices.append(vertex);
-	}
-};
-
 class RTRModel
 {
 public:
-	QVector<RTRVector3D> vertexPositions;
-	QVector<RTRVector3D> vertexNormals;
-	QVector<RTRVector2D> vertexUVPositions;
-	QVector<RTRFace> faces;
+	QSet<RTRModelVertex*> vertices;
+	QSet<RTRModelPolygen*> polygens;
+public:
 	QMap<QString, RTRMaterial*> materialLibrary;
 	QString modelPath;
 public:
 	bool loadModelFromObjFile(const QString& filePath);
 	bool loadMaterialLibraryFromMtlFile(const QString& filePath);
+	bool saveModelToObjFile(const QString& filePath);
+	RTRModelVertex* addVertex(const RTRVector3D& coordinate);
+	RTRModelVertex* addVertex(double _x, double _y, double _z);
+	RTRModelPolygen* addPolygen(const QVector<RTRModelVertex*>& vertices);
+	RTRModelPolygen* addPolygen(const QVector<RTRModelVertex*>& vertices, const QVector<RTRVector2D>& uvMaps);
 	RTRModel();
 	~RTRModel();
 };

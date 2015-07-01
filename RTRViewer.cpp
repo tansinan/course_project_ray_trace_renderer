@@ -4,11 +4,14 @@
 #include "RTRRenderer.h"
 #include <QPainter>
 #include <QDebug>
+#include <QApplication>
 
 RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
-	model->loadModelFromObjFile(QString("D:\\Documents\\SimpleGlass.obj"));
+	model->loadModelFromObjFile(QString("D:\\Documents\\rubik.obj"));
+	model->saveModelToObjFile(QString("D:\\RubikOutput.obj"));
+	QApplication::exit();
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
 }
@@ -34,11 +37,11 @@ void RTRViewer::paintEvent(QPaintEvent* event)
 	if(renderResult==NULL) return;
 
 	RTRCamera camera;
-	camera.cameraAngle = RTRVector(63.6, 0.6, 46.7);
-	//camera.cameraAngle = RTRVector(0, 0, 0);
-	camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
-	//camera.cameraPosition = RTRVector(0, 0, 0);
-	camera.focalLength = 1500;
+	//camera.cameraAngle = RTRVector(63.6, 0.6, 46.7);
+	camera.cameraPosition = RTRVector(5.1, 2.6, 1.9);
+	//camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
+	camera.cameraAngle = RTRVector(83.6, 0.7, 117.9);
+	camera.focalLength = 1000;
 	camera.offset.x() = 400;
 	camera.offset.y() = 300;
 	//camera.focalLength = 500;

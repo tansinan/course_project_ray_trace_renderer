@@ -163,10 +163,13 @@ RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 
 void RTRKdTree::search(QSet<RTRRenderElement*>& searchResult, const RTRSegment& segment) const
 {
-	RTRVector newPoint1 = segment.pointAt(root->splitMethod, root->boundingBox.point1(root->splitMethod));
-	RTRVector newPoint2 = segment.pointAt(root->splitMethod, root->boundingBox.point2(root->splitMethod));
-	RTRSegment segment2(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
-	search(root, searchResult, segment2);
+	RTRVector newPoint1 = segment.beginningPoint;
+	RTRVector newPoint2 = segment.endPoint;
+	while (root->boundingBox.contain(newPoint2))
+	{
+		newPoint2 = newPoint2 * 2 - newPoint1;
+	}
+	search(root, searchResult, RTRSegment(newPoint1,newPoint2,RTRSegment::CREATE_FROM_POINTS));
 }
 
 void RTRKdTree::search(Node* node, QSet<RTRRenderElement*>& searchResult, RTRSegment& segment) const

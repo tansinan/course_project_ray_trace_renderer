@@ -264,3 +264,12 @@ bool RTRBoundingBox::contain(const RTRBoundingBox& other) const
 	}
 	return true;
 }
+
+bool RTRBoundingBox::contain(const RTRVector3D& point) const
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (point(i) < point1(i) || point(i) > point2(i)) return false;
+	}
+	return true;
+}

@@ -152,5 +152,8 @@
     <ClInclude Include="RTRTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RTRModelPolygen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,6 +19,19 @@ RTRModel::~RTRModel()
 
 }
 
+RTRModelVertex* RTRModel::addVertex(const RTRVector3D& coordinate)
+{
+	RTRModelVertex* vertex = new RTRModelVertex();
+	vertex->position = coordinate;
+	vertices.insert(vertex);
+	return vertex;
+}
+
+RTRModelVertex* RTRModel::addVertex(double _x, double _y, double _z)
+{
+	return addVertex(RTRVector3D(_x, _y, _z));
+}
+
 bool RTRModel::loadModelFromObjFile(const QString& filePath)
 {
 	QFileInfo info(filePath);
@@ -32,32 +45,26 @@ bool RTRModel::loadModelFromObjFile(const QString& filePath)
 	QString currentObjectName = "";
 	QString currentGroupName = "";
 	QString materialName = "";
+	QVector<RTRModelVertex*> tempVertexPositions;
+	QVector<RTRVector3D> tempVertexNormals;
+	QVector<RTRVector2D> tempVertexUVPositions;
 	while(!objModelStream.atEnd())
 	{
+		//Read a line, spaces and begin and end are trimmed
 		QString line = objModelStream.readLine().trimmed();
+
+		//Ignore empty lines and comment lines
 		if (line.isEmpty()) continue;
-		if(line[0]=='#')
-		{
-			qDebug() << "Ignoring Comment Line:" << line;
-			continue;
-		}
+		if (line[0] == '#') continue;
+
+
 		QStringList param = line.split(' ', QString::SkipEmptyParts);
 		QString command = param[0];
 		command.toLower();
 		param.removeFirst();
-		if (command == "mtllib")
-		{
-			loadMaterialLibraryFromMtlFile(modelPath + "/" + param[0]);
-		}
-		else if (command == "usemtl")
-		{
-			materialName = param[0];
-		}
-		else if (command == "o")
-		{
-			currentObjectName = param[0];
-			//qDebug() << "Ignoring Unsupported Feature : Object" << objectName;
-		}
+		if (command == "mtllib") loadMaterialLibraryFromMtlFile(modelPath + "/" + param[0]);
+		else if (command == "usemtl") materialName = param[0];
+		else if (command == "o") currentObjectName = param[0];
 		else if (command == "g")
 		{
 			currentGroupName = param[0];
@@ -68,45 +75,46 @@ bool RTRModel::loadModelFromObjFile(const QString& filePath)
 		}
 		else if (command == "v")
 		{
-			vertexPositions.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			tempVertexPositions.append(
+				addVertex(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
 		}
 		else if (command == "vn")
 		{
-			vertexNormals.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			vertexNormals.back().vectorNormalize();
+			tempVertexNormals.append(RTRVector3D(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			tempVertexNormals.back().vectorNormalize();
 		}
 		else if (command == "vt")
 		{
-			vertexUVPositions.append(RTRVector2D(param[0].toDouble(), param[1].toDouble()));
+			tempVertexUVPositions.append(RTRVector2D(param[0].toDouble(), param[1].toDouble()));
 		}
 		else if (command == "f")
 		{
-			RTRFace face;
-			face.objectName = currentObjectName;
-			face.groupName = currentGroupName;
-			face.materialName = materialName;
+			RTRModelPolygen* poly = new RTRModelPolygen();
+			poly->objectName = currentObjectName;
+			poly->groupName = currentGroupName;
+			poly->materialName = materialName;
 			for (int i = 0; i < param.size(); i++)
 			{
 				QStringList list = param[i].split("/");
 				switch (list.size())
 				{
 				case 1:
-					face.addVertex(list[0].toInt());
+					poly->vertices.append(tempVertexPositions[list[0].toInt() - 1]);
 					break;
 				case 2:
-					face.addVertex(list[0].toInt());
-					face.uvCoordinates.append(list[1].toInt());
+					poly->vertices.append(tempVertexPositions[list[0].toInt() - 1]);
+					poly->uvMaps.append(tempVertexUVPositions[list[1].toInt() - 1]);
 					break;
 				case 3:
-					face.addVertex(list[0].toInt());
-					if(!list[1].isEmpty()) face.uvCoordinates.append(list[1].toInt());
-					face.normals.append(list[2].toInt());
+					poly->vertices.append(tempVertexPositions[list[0].toInt() - 1]);
+					if (!list[1].isEmpty()) poly->uvMaps.append(tempVertexUVPositions[list[1].toInt() - 1]);
+					poly->normals.append(tempVertexNormals[list[2].toInt() - 1]);
 					break;
 				default:
 					break;
 				}
 			}
-			faces.append(face);
+			polygens.insert(poly);
 		}
 		else
 		{
@@ -168,4 +176,46 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 	}
 	mtlFile.close();
 	return true;
+}
+
+bool RTRModel::saveModelToObjFile(const QString& filePath)
+{
+	return false;
+	/*QFile objOutputFile(filePath);
+	if (!objOutputFile.open(QIODevice::WriteOnly))
+	{
+		return false;
+	}
+	QTextStream objOutputStream(&objOutputFile);
+	for (int i = 0; i < vertexPositions.size(); i++)
+	{
+		objOutputStream << "v " << vertexPositions[i].x() << " " << vertexPositions[i].y() << " " << vertexPositions[i].z() << "\n";
+	}
+	for (int i = 0; i < faces.size(); i++)
+	{
+		objOutputStream << "f ";
+		for (int j = 0; j < faces[i].vertices.size(); j++)
+		{
+			objOutputStream << faces[i].vertices[j] << " ";
+		}
+		objOutputStream << "\n";
+		//<< faces[i].vertices[]
+	}
+	objOutputFile.close();
+	return false;*/
+}
+
+RTRModelPolygen* RTRModel::addPolygen(const QVector<RTRModelVertex*>& vertices)
+{
+	RTRModelPolygen* poly = new RTRModelPolygen();
+	poly->vertices = vertices;
+	return poly;
+}
+
+RTRModelPolygen* RTRModel::addPolygen(const QVector<RTRModelVertex*>& vertices, const QVector<RTRVector2D>& uvMaps)
+{
+	RTRModelPolygen* poly = new RTRModelPolygen();
+	poly->vertices = vertices;
+	poly->uvMaps = uvMaps;
+	return poly;
 }

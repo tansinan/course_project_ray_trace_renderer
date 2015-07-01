@@ -35,23 +35,21 @@ void RTRRenderer::render()
 	if(model == NULL || camera == NULL) return;
 
 	//扫描所有需要渲染的多边形
-	for(int i=0;i<model->faces.size();i++)
+	foreach(const RTRModelPolygen* face, model->polygens)
 	{
 		//TODO : 只适用于凸多边形！
-
-		RTRFace& face = model->faces[i];
 		//三角形的三个顶点
 		RTRVector point1(3), point2(3), point3(3);
 
 		//将多边形的第一个顶点作为三角形的第一个顶m点
-		point1 = model->vertexPositions[face.vertices[0]-1];
+		point1 = face->vertices[0]->position;
 
 		//而三角形的另外两个顶点从多边形剩下的顶点中取两两相邻的选取。
-		for(int j=1;j<face.vertices.size()-1;j++)
+		for (int j = 1; j < face->vertices.size() - 1; j++)
 		{
 			//构建新的三角形
-			point2 = model->vertexPositions[face.vertices[j] - 1];
-			point3 = model->vertexPositions[face.vertices[j + 1] - 1];
+			point2 = face->vertices[j]->position;
+			point3 = face->vertices[j + 1]->position;
 
 			QColor myBlue;
 			myBlue.setRedF(0.5);
@@ -63,9 +61,10 @@ void RTRRenderer::render()
 
 			//TODO: 存在内存泄漏问题！
 			RTRRenderElement* element = new RTRRenderElement(new RTRTriangle3D(point1, point2, point3), camera);
-			element->objectName = face.objectName;
-			element->material = &material;
-			if (model->vertexNormals.size() > face.normals[j + 1] - 1 &&
+			element->objectName = face -> objectName;
+			element->material = NULL;
+			//element->material = &material;
+			/*if (model->vertexNormals.size() > face.normals[j + 1] - 1 &&
 				model->vertexNormals.size() > face.normals[j] - 1 &&
 				model->vertexNormals.size() > face.normals[0] - 1)
 			{
@@ -73,45 +72,30 @@ void RTRRenderer::render()
 				element->vertexNormals[0] = model->vertexNormals[face.normals[0] - 1];
 				element->vertexNormals[1] = model->vertexNormals[face.normals[j] - 1];
 				element->vertexNormals[2] = model->vertexNormals[face.normals[j + 1] - 1];
-			}
-			else
+			}*/
+			//else
 			{
 				element->useSmoothShading = false;
 			}
-			if (face.materialName == "") element->material = NULL;
+			/*if (face.materialName == "") element->material = NULL;
 			else
 			{
 				element->material = model->materialLibrary[face.materialName];
-			}
+			}*/
 
 			//将三角形添加到需要渲染的三角形的列表之中
 			elements.append(element);
-			//myBlue.setRedF(0.214);
-			//myBlue.setGreenF(0.390);
-			//myBlue.setBlueF(0.698);
-			//renderTriangle(*triangle, material);
 		}
 	}
 	elementsCache = RTRKdTree::create(elements);
-	RTRVector2D pointOnScreen(2);
+
+	//遍历所有的像素点，从它们发出光线并计算渲染结果。
 	for(int i=0;i<image->width();i++)
 	{
 		for(int j=0;j<image->height();j++)
 		{
-			if (i == 40 && j == 40)
-			{
-				i++;
-				i--;
-			}
-			pointOnScreen.x() = i;
-			pointOnScreen.y() = j;
-			RTRRay ray = RTRGeometry::invertProject(pointOnScreen,*camera);
+			RTRRay ray = RTRGeometry::invertProject(RTRVector2D(i,j),*camera);
 			RTRColor color = renderRay(ray);
-			if(i==400&&j==300)
-			{
-				int i=0;
-				i++;
-			}
 			renderPixel(i,j,0,color);
 		}
 	}
@@ -171,7 +155,8 @@ void RTRRenderer::renderLineByDDA(RTRVector2D p1, RTRVector2D p2, const QColor &
 RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTRRenderElement* elementFrom)
 {
 	//RTRVector* vec3D = new RTRVector(3)[100];
-	RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRColor(1,1,1),7.5);
+	//RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRColor(1,1,1),7.5);
+	RTRLightPoint lightPoint(RTRVector(2.3, -0.9, 6.7), RTRColor(1, 1, 1), 7.5);
 	QColor myBlue;
 	myBlue.setRedF(0.5);
 	myBlue.setGreenF(0.5);
@@ -227,7 +212,7 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	}
 
 	RTRColor reflectionColor(1.0,0.0,0.0);
-	if (frontElement != NULL /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<4)
+	if (frontElement != NULL /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<0)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;

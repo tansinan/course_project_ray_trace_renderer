@@ -108,6 +108,7 @@ public:
 public:
 	RTRBoundingBox();
 	bool contain(const RTRBoundingBox& other) const;
+	bool contain(const RTRVector3D& point) const;
 };
 
 
