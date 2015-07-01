@@ -29,16 +29,16 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		}
 	}
 
-	double rangeX = qMax(abs(triangle3D->vertices[0].x() - triangle3D->vertices[1].x()),
-		qMax(abs(triangle3D->vertices[1].x() - triangle3D->vertices[2].x()),
+	double rangeX = qMin(abs(triangle3D->vertices[0].x() - triangle3D->vertices[1].x()),
+		qMin(abs(triangle3D->vertices[1].x() - triangle3D->vertices[2].x()),
 		abs(triangle3D->vertices[0].x() - triangle3D->vertices[2].x())));
 
-	double rangeY = qMax(abs(triangle3D->vertices[0].y() - triangle3D->vertices[1].y()),
-		qMax(abs(triangle3D->vertices[1].y() - triangle3D->vertices[2].y()),
+	double rangeY = qMin(abs(triangle3D->vertices[0].y() - triangle3D->vertices[1].y()),
+		qMin(abs(triangle3D->vertices[1].y() - triangle3D->vertices[2].y()),
 		abs(triangle3D->vertices[0].y() - triangle3D->vertices[2].y())));
 
-	double rangeZ = qMax(abs(triangle3D->vertices[0].z() - triangle3D->vertices[1].z()),
-		qMax(std::abs(triangle3D->vertices[1].z() - triangle3D->vertices[2].z()),
+	double rangeZ = qMin(abs(triangle3D->vertices[0].z() - triangle3D->vertices[1].z()),
+		qMin(std::abs(triangle3D->vertices[1].z() - triangle3D->vertices[2].z()),
 		abs(triangle3D->vertices[0].z() - triangle3D->vertices[2].z())));
 
 	RTRVector2D vert1(2), vert2(2), vert3(2);
@@ -100,67 +100,65 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
 	}
 	if (!ret) return false;
+
+	double a1, a2, a3;
+	RTRVector3D line12 = triangle3D->vertices[1] - triangle3D->vertices[0];
+	RTRVector3D line13 = triangle3D->vertices[2] - triangle3D->vertices[0];
+	RTRVector3D line1p = result - triangle3D->vertices[0];
+
+	if (orthProjectDirection == 0)
+	{
+		double det = line13.y() * line12.z() - line12.y() * line13.z();
+		a2 = line1p.y() * line13.z() - line13.y() * line1p.z();
+		a2 = abs(a2 / det);
+		a3 = line1p.y() * line12.z() - line12.y() * line1p.z();
+		a3 = abs(a3 / det);
+		a1 = 1 - a2 - a3;
+	}
+	else if (orthProjectDirection == 1)
+	{
+		double det = line13.x() * line12.z() - line12.x() * line13.z();
+		a2 = line1p.x() * line13.z() - line13.x() * line1p.z();
+		a2 = abs(a2 / det);
+		a3 = line1p.x() * line12.z() - line12.x() * line1p.z();
+		a3 = abs(a3 / det);
+		a1 = 1 - a2 - a3;
+	}
+	else if (orthProjectDirection == 2)
+	{
+		double det = line13.x() * line12.y() - line12.x() * line13.y();
+		a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
+		a2 = abs(a2 / det);
+		a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
+		a3 = abs(a3 / det);
+		a1 = 1 - a2 - a3;
+	}
+
+	//处理Phong法线平滑着色
 	if (useSmoothShading)
 	{
-		double a1, a2, a3;
-		RTRVector3D line12 = triangle3D->vertices[1] - triangle3D->vertices[0];
-		RTRVector3D line13 = triangle3D->vertices[2] - triangle3D->vertices[0];
-		RTRVector3D line1p = result - triangle3D->vertices[0];
-
-		if (orthProjectDirection == 0)
-		{
-			double det = line13.y() * line12.z() - line12.y() * line13.z();
-			a2 = line1p.y() * line13.z() - line13.y() * line1p.z();
-			a2 = abs(a2 / det);
-			a3 = line1p.y() * line12.z() - line12.y() * line1p.z();
-			a3 = abs(a3 / det);
-			a1 = 1 - a2 - a3;
-		}
-		else if (orthProjectDirection == 1)
-		{
-			double det = line13.x() * line12.z() - line12.x() * line13.z();
-			a2 = line1p.x() * line13.z() - line13.x() * line1p.z();
-			a2 = abs(a2 / det);
-			a3 = line1p.x() * line12.z() - line12.x() * line1p.z();
-			a3 = abs(a3 / det);
-			a1 = 1 - a2 - a3;
-		}
-		else if (orthProjectDirection == 2)
-		{
-			double det = line13.x() * line12.y() - line12.x() * line13.y();
-			a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
-			a2 = abs(a2 / det);
-			a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
-			a3 = abs(a3 / det);
-			a1 = 1 - a2 - a3;
-		}
 		normal = vertexNormals[0] * a1 + vertexNormals[1] * a2 + vertexNormals[2] * a3;
 	}
 	else
 	{
 		normal = triangle3D->plane.normal;
 	}
-	//if (objectName != "Plane")
+
+
+	//处理漫反射颜色贴图
+	if (material != NULL)
 	{
-		if (material != NULL)
+		if (material->getPropertyType("diffuse")==RTRMaterial::TYPE_COLOR) color = material->getColorAt("diffuse", 0, 0);
+		else if (material->getPropertyType("diffuse") == RTRMaterial::TYPE_TEXTURE)
 		{
-			color = material->getColorAt("diffuse", 0, 0);
+			RTRVector2D uvPos = vertexUVMaps[0] * a1 + vertexUVMaps[1] * a2 + vertexUVMaps[2] * a3;
+			color = material->getColorAt("diffuse", uvPos.x(), 1 - uvPos.y());
 		}
-		else color.r() = color.g() = color.b() = 1.0;
 	}
-	/*else
+	else
 	{
-		int x = qRound(result.x());
-		int y = qRound(result.y());
-		if ((x + y) % 2 == 0)
-		{
-			color.r() = color.g() = color.b() = 0.25;
-		}
-		else
-		{
-			color.r() = color.g() = color.b() = 0.75;
-		}
-	}*/
+		color.r() = color.g() = color.b() = 1.0;
+	}
 	return ret;
 }
 

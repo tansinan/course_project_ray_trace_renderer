@@ -10,8 +10,8 @@ RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
 	model->loadModelFromObjFile(QString("D:\\Documents\\rubik.obj"));
-	model->saveModelToObjFile(QString("D:\\RubikOutput.obj"));
-	QApplication::exit();
+	//model->saveModelToObjFile(QString("D:\\RubikOutput.obj"));
+	//QApplication::exit();
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
 }
@@ -41,7 +41,7 @@ void RTRViewer::paintEvent(QPaintEvent* event)
 	camera.cameraPosition = RTRVector(5.1, 2.6, 1.9);
 	//camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
 	camera.cameraAngle = RTRVector(83.6, 0.7, 117.9);
-	camera.focalLength = 1000;
+	camera.focalLength = 400;
 	camera.offset.x() = 400;
 	camera.offset.y() = 300;
 	//camera.focalLength = 500;

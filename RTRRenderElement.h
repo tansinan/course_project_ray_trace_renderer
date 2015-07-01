@@ -19,6 +19,7 @@ public:
 	RTRMaterial* material;
 	RTRBoundingBox boundingBox;
 	RTRVector3D vertexNormals[3];
+	RTRVector2D vertexUVMaps[3];
 	virtual const RTRBoundingBox& getBoundingBox() const;
 	virtual bool intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const;
 	virtual bool intersect(const RTRRay& ray, RTRVector3D& result);

@@ -13,6 +13,9 @@ class RTRTexture;
 class RTRMaterial
 {
 public:
+	static const int TYPE_NONE = 0;
+	static const int TYPE_COLOR = 1;
+	static const int TYPE_TEXTURE = 2;
 	QMap<QString, RTRColor> colorProperties;
 	QMap<QString, RTRTexture*> textureProperties;
 	/**
@@ -29,6 +32,7 @@ public:
 	RTRMaterial();
 	void setColorProperty(const QString& propertyName, const RTRColor& color);
 	void setTextureProperty(const QString& propertyName, const QString& textureFilePath);
+	int getPropertyType(const QString& propertyName);
 	RTRColor getColorAt(const QString& propertyName, double u, double v);
 signals:
 

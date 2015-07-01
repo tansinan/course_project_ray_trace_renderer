@@ -6,12 +6,6 @@
 #include "RTRGeometry.h"
 #include "Light/RTRLightPoint.h"
 
-template<class T>
-int sgn(T val)
-{
-	return val>0?1:-1;
-}
-
 RTRRenderer::RTRRenderer(QImage *_image)
 {
 	model = NULL;
@@ -37,6 +31,7 @@ void RTRRenderer::render()
 	//扫描所有需要渲染的多边形
 	foreach(const RTRModelPolygen* face, model->polygens)
 	{
+		//if (face->objectName != "Plane") continue;
 		//TODO : 只适用于凸多边形！
 		//三角形的三个顶点
 		RTRVector point1(3), point2(3), point3(3);
@@ -62,7 +57,13 @@ void RTRRenderer::render()
 			//TODO: 存在内存泄漏问题！
 			RTRRenderElement* element = new RTRRenderElement(new RTRTriangle3D(point1, point2, point3), camera);
 			element->objectName = face -> objectName;
-			element->material = NULL;
+			element->material = model->materialLibrary[face->materialName];
+			if (face->uvMaps.size() > 0)
+			{
+				element->vertexUVMaps[0] = face->uvMaps[0];
+				element->vertexUVMaps[1] = face->uvMaps[j];
+				element->vertexUVMaps[2] = face->uvMaps[j + 1];
+			}
 			//element->material = &material;
 			/*if (model->vertexNormals.size() > face.normals[j + 1] - 1 &&
 				model->vertexNormals.size() > face.normals[j] - 1 &&
@@ -216,7 +217,7 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	}
 
 	RTRColor reflectionColor(1.0,0.0,0.0);
-	if (frontElement != NULL && frontElement->objectName == "Plane" /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<1)
+	if (frontElement != NULL && frontElement->objectName == "Plane" /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<3)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;

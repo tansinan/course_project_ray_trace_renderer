@@ -33,3 +33,10 @@ RTRColor RTRMaterial::getColorAt(const QString& propertyName, double u, double v
 		return colorProperties[propertyName];
 	}
 }
+
+int RTRMaterial::getPropertyType(const QString& propertyName)
+{
+	if (textureProperties.find(propertyName) != textureProperties.end()) return TYPE_TEXTURE;
+	if (colorProperties.find(propertyName) != colorProperties.end()) return TYPE_COLOR;
+	return TYPE_NONE;
+}

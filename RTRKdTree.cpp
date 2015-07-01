@@ -1,4 +1,5 @@
 #include "RTRKdTree.h"
+#include <qmath.h>
 
 RTRKdTree::RTRKdTree()
 {
@@ -171,7 +172,8 @@ void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const
 	}
 	double minZ = 1e10;
 	searchResult = NULL;
-	search(root, searchResult, RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS), RTRRay(ray), minZ, elementFrom);
+	search(root, searchResult, RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS), 
+		RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS), minZ, elementFrom);
 }
 
 void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
@@ -185,7 +187,11 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 		RTRVector3D temp;
 		if (node->data[i]->intersect(ray, temp))
 		{
-			double zVal = abs(ray.beginningPoint.z() - temp.z());
+			if (sgn(ray.beginningPoint.y() - temp.y()) != sgn(ray.beginningPoint.y() - ray.endPoint.y()))
+			{
+				continue;
+			}
+			double zVal = abs(ray.beginningPoint.y() - temp.y());
 			if (zVal<minZ)
 			{
 				minZ = zVal;
@@ -205,7 +211,8 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 	double b1 = segment.beginningPoint(splitMethod);
 	double b2 = segment.endPoint(splitMethod);
 	if (a1 > a2) std::swap(a1, a2);
-	//if (a1 > b2 || b1 > a2) return;
+	if (b1 > b2) std::swap(b1, b2);
+	if (a1 > b2 || b1 > a2) return;
 	//segment.beginningPoint(splitMethod)
 	if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod) - (1e-5))
 	{

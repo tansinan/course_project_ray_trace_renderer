@@ -6,6 +6,12 @@
 #include "RTRVector3D.h"
 #include "RTRVector2D.h"
 
+template<class T>
+int sgn(T val)
+{
+	return val>0 ? 1 : -1;
+}
+
 class RTRPlane
 {
 public:
