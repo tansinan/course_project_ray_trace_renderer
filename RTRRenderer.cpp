@@ -163,9 +163,9 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	myBlue.setBlueF(0.5);
 	RTRMaterial material(myBlue,Qt::black);
 
-	//QSet<RTRRenderElement*> possibleElements;
-	RTRRenderElement* possibleElements;
-	elementsCache->search(possibleElements, ray, elementFrom);
+	QSet<RTRRenderElement*> possibleElements;
+
+	elementsCache->search(possibleElements, ray);
 
 	//TODO: check 3D Z Order Algorithm
 
@@ -176,20 +176,16 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	RTRVector3D intersectPoint(0.0, 0.0, 0.0);
 	RTRVector3D intersectNormal(0.0, 0.0, 0.0);
 	RTRColor intersectColor(0.0, 0.0, 0.0);
-	//foreach(const RTRRenderElement* element, possibleElements)
-	if (possibleElements != NULL)
+	foreach(const RTRRenderElement* element, possibleElements)
 	{
-		RTRRenderElement* element = possibleElements;
 		RTRVector3D point(0.0, 0.0, 0.0);
 		RTRVector3D normal(0.0, 0.0, 0.0);
 		RTRColor objColor(0.0, 0.0, 0.0);
-		element->intersect(ray, point, normal, objColor);
-		//if (!element->intersect(ray, point, normal, objColor));continue;
+		if (!element->intersect(ray, point, normal, objColor)) continue;
 		double zValue = ray.direction.dotProduct(point - ray.beginningPoint);
-		//if (zValue < 0) continue;
-		//double zValue = abs(point.z() - ray.beginningPoint.z());
-		//if (zValue > minZ) continue;
-		//if (element == elementFrom) continue;
+		if (zValue < 0) continue;
+		if (zValue > minZ) continue;
+		if (element == elementFrom) continue;
 		frontElement = element;
 		intersectPoint = point;
 		intersectColor = objColor;
@@ -216,7 +212,7 @@ RTRColor RTRRenderer::renderRay(const RTRRay& ray, int iterationCount, const RTR
 	}
 
 	RTRColor reflectionColor(1.0,0.0,0.0);
-	if (frontElement != NULL && frontElement->objectName == "Plane" /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<1)
+	if (frontElement != NULL /*&& (frontElement->objectName == "Sphere" || frontElement->objectName == "Cube_Cube.001")*/ && iterationCount<0)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
