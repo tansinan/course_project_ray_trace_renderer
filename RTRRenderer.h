@@ -39,9 +39,6 @@ public:
 	RTRRenderer(QImage* _image);
 	void render();
 	void renderPixel(int x, int y, double z, const RTRColor &color);
-	void renderLineByDDA(int x1, int y1, int x2, int y2, const QColor &color);
-	void renderLineByDDA(RTRVector2D p1, RTRVector2D p2, const QColor &color);
-	void renderTriangle(const RTRTriangle3D& triangle, const RTRMaterial& material);
 
 	/**
 	 * @brief renderRay实现了光线追踪的核心算法——它渲染一个光路的“颜色”。
@@ -50,7 +47,6 @@ public:
 	 * @param elementFrom 发出该逆向光线的渲染元素。该参数主要用于防止发生光线求交误判为和自己想交的情况。
 	 * @return 获得的颜色数值。
 	 */
-	RTRColor renderRay(const RTRRay& ray, int iterationCount = 0, const RTRRenderElement* elementFrom = NULL);
 };
 
 #endif // RTRRENDERER_H

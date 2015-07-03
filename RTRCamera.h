@@ -38,12 +38,12 @@ public:
 	/**
 	* @brief rotationMatrix是根据相机的旋转角度计算出来的旋转矩阵
 	*/
-	RTRMatrix rotationMatrix;
+	RTRMatrix33 rotationMatrix;
 
 	/**
 	* @brief inverseRotationMatrix是用于你变幻时使用的旋转矩阵
 	*/
-	RTRMatrix inverseRotationMatrix;
+	RTRMatrix33 inverseRotationMatrix;
 
 	/**
 	* @brief evaluateRotationMatrix计算相机的旋转矩阵
@@ -57,7 +57,7 @@ public:
 	* @param point表示三维空间中的一个点
 	* @return 点经过变换后在二维空间的位置
 	*/
-	RTRVector transformPoint(RTRVector3D point) const;
+	RTRVector2D transformPoint(RTRVector3D point) const;
 
 	/**
 	* @brief invertProject将投影后的一个点转换回三维空间（但是对应一条直线）

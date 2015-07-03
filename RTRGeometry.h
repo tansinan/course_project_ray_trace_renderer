@@ -127,14 +127,13 @@ public:
 	//static bool intersect(RTRTriangle3D, RTRSegment);
 	static RTRVector3D intersect(const RTRPlane &plane, const RTRSegment &segment);
 	static bool intersect(const RTRBoundingBox& boundingBox, RTRSegment &segment);
-	static RTRVector2D project(const RTRVector& point, const RTRCamera& camera);
-	static RTRSegment project(const RTRSegment& segment, const RTRCamera& camera);
+	static RTRVector2D project(const RTRVector3D& point, const RTRCamera& camera);
 	static RTRTriangle2D project(const RTRTriangle3D &triangle3D, const RTRCamera &camera);
-	static RTRMatrix rotationMatrix(double angleX, double angleY, double angleZ);
-	static RTRMatrix inverseRotationMatrix(double angleX, double angleY, double angleZ);
+	static RTRMatrix33 rotationMatrix(double angleX, double angleY, double angleZ);
+	static RTRMatrix33 inverseRotationMatrix(double angleX, double angleY, double angleZ);
 
 	//将点反向投影回空间中的一条直线（由于R3->R2的变换本身是不可逆的，因此没有附加信息结果不可能是一个点）
-	static RTRSegment invertProject(const RTRVector& point, const RTRCamera& camera);
+	static RTRSegment invertProject(const RTRVector2D& point, const RTRCamera& camera);
 
 
 	/**
@@ -146,7 +145,7 @@ public:
 	*/
 	static RTRVector3D invertProjectTo(const RTRVector2D& point, const RTRCamera& camera, bool& isInside);
 
-	static double distance(RTRVector point, RTRPlane plane);
+	static double distance(RTRVector3D point, RTRPlane plane);
 };
 
 

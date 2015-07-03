@@ -179,8 +179,8 @@ RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 
 void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const
 {
-	RTRVector newPoint1 = ray.beginningPoint;
-	RTRVector newPoint2 = ray.endPoint;
+	RTRVector3D newPoint1 = ray.beginningPoint;
+	RTRVector3D newPoint2 = ray.endPoint;
 	while (root->boundingBox.contain(newPoint2))
 	{
 		newPoint2 = newPoint2 * 2 - newPoint1;
@@ -239,7 +239,7 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 	RTRSegment segmentSmallTemp, segmentLargeTemp;
 	segmentSmallTemp.beginningPoint = segment.beginningPoint;
 	segmentLargeTemp.endPoint = segment.endPoint;
-	RTRVector midPoint = segment.pointAt(splitMethod, node->small->boundingBox.point2(splitMethod));
+	RTRVector3D midPoint = segment.pointAt(splitMethod, node->small->boundingBox.point2(splitMethod));
 	segmentSmallTemp.endPoint = segmentLargeTemp.beginningPoint = midPoint;
 	if (rand() % 2 == 0)
 	{

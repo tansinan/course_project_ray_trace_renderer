@@ -5,12 +5,12 @@
 
 class QColor;
 
-class RTRVector2D : public RTRMatrix
+class RTRVector2D : public RTRMatrix<2,1>
 {
 public:
 	RTRVector2D();
 	RTRVector2D(double _x, double _y);
-	RTRVector2D(const RTRMatrix& matrix);
+	RTRVector2D(const RTRMatrix<2,1>& matrix);
 	double& x();
 	double x()const;
 	double& y();
