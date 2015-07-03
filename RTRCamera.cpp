@@ -3,10 +3,6 @@
 #include <QDebug>
 
 RTRCamera::RTRCamera()
-	:cameraAngle()
-	,cameraPosition()
-	,rotationMatrix(3,3)
-	,offset()
 {
 
 }
@@ -37,9 +33,9 @@ void RTRCamera::evaluateRotationMatrix()
 	rotationMatrix = rotateX*rotateY*rotateZ;*/
 }
 
-RTRVector RTRCamera::transformPoint(RTRVector3D point) const
+RTRVector2D RTRCamera::transformPoint(RTRVector3D point) const
 {
-	RTRVector2D ret(2);
+	RTRVector2D ret;
 	RTRVector3D relativePosition = rotationMatrix*(point-cameraPosition);
 	//rotationMatrix.printDebugInfo();
 	//qDebug() << ret.x() << ret.y() << ret.z();

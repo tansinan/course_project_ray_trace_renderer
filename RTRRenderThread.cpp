@@ -52,7 +52,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 	//RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRColor(1,1,1),7.5);
 
 	//面光源的随机采样
-	RTRLightPoint lightPoint(RTRVector(2.3 + (rand() / (double)RAND_MAX * 2 - 1)
+	RTRLightPoint lightPoint(RTRVector3D(2.3 + (rand() / (double)RAND_MAX * 2 - 1)
 		, -0.9 + (rand() / (double)RAND_MAX * 2 - 1)
 		, 6.7 + (rand() / (double)RAND_MAX * 2 - 1)), RTRColor(1, 1, 1), 7.5);
 

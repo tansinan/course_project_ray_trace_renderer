@@ -7,7 +7,7 @@
 class RTRLightAbstract
 {
 public:
-	virtual RTRColor colorAt(RTRVector point) = 0;
+	virtual RTRColor colorAt(RTRVector3D point) = 0;
 };
 
 #endif // RTRLIGHTSOURCE_H

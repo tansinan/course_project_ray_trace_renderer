@@ -148,16 +148,9 @@ RTRVector3D RTRGeometry::intersect(const RTRPlane& plane, const RTRSegment& segm
 	return segment.beginningPoint + (segment.endPoint-segment.beginningPoint) * ratio;
 }
 
-RTRVector2D RTRGeometry::project(const RTRVector &point, const RTRCamera &camera)
+RTRVector2D RTRGeometry::project(const RTRVector3D &point, const RTRCamera &camera)
 {
 	return camera.transformPoint(point);
-}
-
-RTRSegment RTRGeometry::project(const RTRSegment& segment, const RTRCamera& camera)
-{
-	return RTRSegment(camera.transformPoint(segment.beginningPoint),
-					  camera.transformPoint(segment.endPoint),
-					  RTRSegment::CREATE_FROM_POINTS);
 }
 
 RTRTriangle2D RTRGeometry::project(const RTRTriangle3D& triangle3D, const RTRCamera& camera)
@@ -168,9 +161,9 @@ RTRTriangle2D RTRGeometry::project(const RTRTriangle3D& triangle3D, const RTRCam
 			);
 }
 
-RTRMatrix RTRGeometry::rotationMatrix(double angleX, double angleY, double angleZ)
+RTRMatrix33 RTRGeometry::rotationMatrix(double angleX, double angleY, double angleZ)
 {
-	RTRMatrix rotateX(3,3), rotateY(3,3), rotateZ(3,3);
+	RTRMatrix33 rotateX, rotateY, rotateZ;
 	rotateX.fill(0);
 	rotateX(0, 0) = 1;
 	rotateX(2,2) = rotateX(1, 1) = qCos(qDegreesToRadians(angleX));
@@ -191,9 +184,9 @@ RTRMatrix RTRGeometry::rotationMatrix(double angleX, double angleY, double angle
 	return rotateX*rotateY*rotateZ;
 }
 
-RTRMatrix RTRGeometry::inverseRotationMatrix(double angleX, double angleY, double angleZ)
+RTRMatrix33 RTRGeometry::inverseRotationMatrix(double angleX, double angleY, double angleZ)
 {
-	RTRMatrix rotateX(3,3), rotateY(3,3), rotateZ(3,3);
+	RTRMatrix33 rotateX, rotateY, rotateZ;
 	rotateX.fill(0);
 	rotateX(0, 0) = 1;
 	rotateX(2,2) = rotateX(1, 1) = qCos(qDegreesToRadians(-angleX));
@@ -214,12 +207,12 @@ RTRMatrix RTRGeometry::inverseRotationMatrix(double angleX, double angleY, doubl
 	return rotateZ*rotateY*rotateX;
 }
 
-RTRSegment RTRGeometry::invertProject(const RTRVector &point, const RTRCamera &camera)
+RTRSegment RTRGeometry::invertProject(const RTRVector2D &point, const RTRCamera &camera)
 {
 	return camera.inverseProject(point);
 }
 
-double RTRGeometry::distance(RTRVector point, RTRPlane plane)
+double RTRGeometry::distance(RTRVector3D point, RTRPlane plane)
 {
 	return (point - plane.onePoint).dotProduct(plane.normal);
 }
@@ -248,7 +241,6 @@ bool RTRGeometry::intersect(const RTRBoundingBox& boundingBox, RTRSegment &segme
 }
 
 RTRBoundingBox::RTRBoundingBox()
-	:point1(3), point2(3)
 {
 
 }

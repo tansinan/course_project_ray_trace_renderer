@@ -58,9 +58,6 @@
     <ClCompile Include="RTRMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RTRMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RTRModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

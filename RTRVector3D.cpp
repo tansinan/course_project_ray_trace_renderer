@@ -2,13 +2,11 @@
 #include <QtCore>
 
 RTRVector3D::RTRVector3D()
-	:RTRMatrix(3)
 {
 	x() = y() = z() = 0.0;
 }
 
 RTRVector3D::RTRVector3D(double _x, double _y, double _z)
-	:RTRMatrix(3)
 {
 	x() = _x;
 	y() = _y;
@@ -16,7 +14,6 @@ RTRVector3D::RTRVector3D(double _x, double _y, double _z)
 }
 
 RTRVector3D::RTRVector3D(const RTRMatrix& matrix)
-	:RTRMatrix(3)
 {
 	Q_ASSERT(matrix.isVector() && matrix.getSize() == 3);
 	x() = matrix(0);
