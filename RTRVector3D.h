@@ -5,12 +5,12 @@
 
 class QColor;
 
-class RTRVector3D : public RTRMatrix<3,1>
+class RTRVector3D : public RTRMatrix
 {
 public:
 	RTRVector3D();
 	RTRVector3D(double _x, double _y, double _z);
-	RTRVector3D(const RTRMatrix<3,1>& matrix);
+	RTRVector3D(const RTRMatrix& matrix);
 	double& x();
 	double x()const;
 	double& y();

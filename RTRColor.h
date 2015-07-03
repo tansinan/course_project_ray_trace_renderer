@@ -5,13 +5,13 @@
 
 class QColor;
 
-class RTRColor : public RTRMatrix<4,1>
+class RTRColor : public RTRMatrix
 {
 public:
 	RTRColor();
 	RTRColor(double _r, double _g, double _b);
 	RTRColor(double _r, double _g, double _b, double _a);
-	RTRColor(const RTRMatrix<4,1>& matrix);
+	RTRColor(const RTRMatrix& matrix);
 	double& r();
 	double r()const;
 	double& g();

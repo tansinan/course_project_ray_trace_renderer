@@ -35,7 +35,7 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 	double areaY = qAbs((triangle3D->vertices[1].z() - triangle3D->vertices[0].z())*(triangle3D->vertices[2].x() - triangle3D->vertices[0].x())
 		- (triangle3D->vertices[1].x() - triangle3D->vertices[0].x())*(triangle3D->vertices[2].z() - triangle3D->vertices[0].z()));
 
-	RTRVector2D vert1, vert2, vert3;
+	RTRVector2D vert1(2), vert2(2), vert3(2);
 
 	if (areaX >= areaY&&areaX >= areaZ)
 	{
@@ -73,7 +73,7 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const
 {
 	result = RTRGeometry::intersect(triangle3D->plane, ray);
-	RTRVector2D temp;
+	RTRVector2D temp(2);
 	bool ret = true;
 	if (orthProjectDirection == 0)
 	{
@@ -159,7 +159,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result)
 {
 	result = RTRGeometry::intersect(triangle3D->plane, ray);
-	RTRVector2D temp;
+	RTRVector2D temp(2);
 	bool ret = true;
 	if (orthProjectDirection == 0)
 	{

@@ -3,12 +3,14 @@
 #include <QColor>
 
 RTRColor::RTRColor()
+	:RTRMatrix(4)
 {
 	r() = g() = b() = 0.0;
 	a() = 1.0;
 }
 
 RTRColor::RTRColor(double _r, double _g, double _b)
+	:RTRMatrix(4)
 {
 	r() = _r;
 	g() = _g;
@@ -17,7 +19,9 @@ RTRColor::RTRColor(double _r, double _g, double _b)
 }
 
 RTRColor::RTRColor(const RTRMatrix& matrix)
+	:RTRMatrix(4)
 {
+	Q_ASSERT(matrix.isVector() && matrix.getSize() == 4);
 	r() = matrix(0);
 	g() = matrix(1);
 	b() = matrix(2);

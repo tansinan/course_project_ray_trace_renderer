@@ -13,7 +13,7 @@ protected:
 	/**
 	 * @brief position表示点光源的位置
 	 */
-	RTRVector3D position;
+	RTRVector position;
 
 	/**
 	 * @brief color表示点光源的颜色
@@ -25,12 +25,12 @@ protected:
 	 */
 	double multiplier;
 public:
-	RTRLightPoint(RTRVector3D _position, RTRColor _color, double _multiplier);
+	RTRLightPoint(RTRVector _position, RTRColor _color, double _multiplier);
 	const RTRColor& getColor();
-	const RTRVector3D& getPosition();
+	const RTRVector& getPosition();
 	double getMultiplier();
-	RTRColor colorAt(RTRVector3D point);
-	RTRVector3D directionAt(RTRVector3D point);
+	RTRColor colorAt(RTRVector point);
+	RTRVector directionAt(RTRVector point);
 };
 
 #endif // RTRPOINTLIGHT_H

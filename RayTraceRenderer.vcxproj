@@ -167,6 +167,7 @@
     <ClCompile Include="RTRKdTree.cpp" />
     <ClCompile Include="Light\RTRLightPoint.cpp" />
     <ClCompile Include="RTRMaterial.cpp" />
+    <ClCompile Include="RTRMatrix.cpp" />
     <ClCompile Include="RTRModel.cpp" />
     <ClCompile Include="RTRRenderElement.cpp" />
     <ClCompile Include="RTRRenderThread.cpp" />
