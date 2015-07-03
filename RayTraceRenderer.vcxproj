@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>".";"C:\qt\qt5.4.1\5.4\msvc2013_64\include";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore";"release";"C:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013";%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>".";".";"release";"$(QTDIR)\mkspecs\win32-msvc2013";"C:\qt\qt5.4.1\5.4\msvc2013_64\include";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore";"release";"C:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013";%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -Zc:strictStrings -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -64,7 +64,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;_WINDOWS;WIN64;QT_WIDGETS_LIB;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\qt\qt5.4.1\5.4\msvc2013_64\lib\qtmain.lib;shell32.lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib\Qt5Core.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Widgets.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Gui.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\qt\qt5.4.1\5.4\msvc2013_64\lib\qtmain.lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib\Qt5Core.lib;shell32.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Widgets.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Gui.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\qt\qt5.4.1\5.4\msvc2013_64\lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -92,12 +92,12 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;_WINDOWS;WIN64;QT_WIDGETS_LIB;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>".";"C:\qt\qt5.4.1\5.4\msvc2013_64\include";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore";"debug";"C:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013";%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>".";".";"release";"$(QTDIR)\mkspecs\win32-msvc2013";"C:\qt\qt5.4.1\5.4\msvc2013_64\include";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE";"C:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore";"debug";"C:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013";%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -105,7 +105,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;_WINDOWS;WIN64;QT_WIDGETS_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -115,7 +115,7 @@
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\qt\qt5.4.1\5.4\msvc2013_64\lib\qtmaind.lib;shell32.lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib\Qt5Cored.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Widgetsd.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Guid.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\qt\qt5.4.1\5.4\msvc2013_64\lib\qtmaind.lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib\Qt5Cored.lib;shell32.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Widgetsd.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Guid.lib;C:\qt\qt5.4.1\5.4\msvc2013_64\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\qt\qt5.4.1\5.4\msvc2013_64\lib;C:\Qt\Qt5.4.1\5.4\msvc2013_64\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>"/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -132,11 +132,17 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;_WINDOWS;WIN64;QT_WIDGETS_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Debug\moc_MainWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RTRRenderer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RTRRenderThread.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Debug\moc_RTRViewer.cpp">
@@ -144,6 +150,12 @@
     </ClCompile>
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Release\moc_MainWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RTRRenderer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RTRRenderThread.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Release\moc_RTRViewer.cpp">
@@ -158,6 +170,7 @@
     <ClCompile Include="RTRMatrix.cpp" />
     <ClCompile Include="RTRModel.cpp" />
     <ClCompile Include="RTRRenderElement.cpp" />
+    <ClCompile Include="RTRRenderThread.cpp" />
     <ClCompile Include="RTRRenderer.cpp" />
     <ClCompile Include="RTRVector2D.cpp" />
     <ClCompile Include="RTRVector3D.cpp" />
@@ -165,24 +178,20 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RTRModelPolygen.h" />
-    <ClInclude Include="RTRTexture.h" />
-    <ClInclude Include="RTRVector2D.h" />
-    <ClInclude Include="RTRVector3D.h" />
     <CustomBuild Include="MainWindow.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\release" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing MainWindow.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing MainWindow.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
@@ -199,23 +208,66 @@ endlocal
     <ClInclude Include="RTRMatrix.h" />
     <ClInclude Include="RTRModel.h" />
     <ClInclude Include="RTRModelObject.h" />
+    <ClInclude Include="RTRModelPolygen.h" />
     <ClInclude Include="RTRModelVertex.h" />
     <ClInclude Include="RTRRenderElement.h" />
-    <ClInclude Include="RTRRenderer.h" />
+    <CustomBuild Include="RTRRenderThread.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing RTRRenderThread.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing RTRRenderThread.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="RTRRenderer.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing RTRRenderer.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+if errorlevel 1 goto VCEnd
+
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing RTRRenderer.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="RTRTexture.h" />
+    <ClInclude Include="RTRVector2D.h" />
+    <ClInclude Include="RTRVector3D.h" />
     <CustomBuild Include="RTRViewer.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\release" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing RTRViewer.h...</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 if errorlevel 1 goto VCEnd
 
 if errorlevel 1 goto VCEnd
 endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB "-I." "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2013" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtWidgets" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtGui" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtANGLE" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\include\QtCore" "-I.\debug" "-IC:\qt\qt5.4.1\5.4\msvc2013_64\mkspecs\win32-msvc2013"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing RTRViewer.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>

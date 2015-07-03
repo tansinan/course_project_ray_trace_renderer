@@ -14,7 +14,6 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 {
 	material = NULL;
 	triangle3D = _triangle3D;
-	triangle2D = new RTRTriangle2D(RTRGeometry::project(*triangle3D, *camera));
 	for (int i = 0; i < 3; i++)
 	{
 		boundingBox.point1(i) = 1e50;
@@ -29,21 +28,16 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		}
 	}
 
-	double rangeX = qMin(abs(triangle3D->vertices[0].x() - triangle3D->vertices[1].x()),
-		qMin(abs(triangle3D->vertices[1].x() - triangle3D->vertices[2].x()),
-		abs(triangle3D->vertices[0].x() - triangle3D->vertices[2].x())));
-
-	double rangeY = qMin(abs(triangle3D->vertices[0].y() - triangle3D->vertices[1].y()),
-		qMin(abs(triangle3D->vertices[1].y() - triangle3D->vertices[2].y()),
-		abs(triangle3D->vertices[0].y() - triangle3D->vertices[2].y())));
-
-	double rangeZ = qMin(abs(triangle3D->vertices[0].z() - triangle3D->vertices[1].z()),
-		qMin(std::abs(triangle3D->vertices[1].z() - triangle3D->vertices[2].z()),
-		abs(triangle3D->vertices[0].z() - triangle3D->vertices[2].z())));
+	double areaZ = qAbs((triangle3D->vertices[1].x() - triangle3D->vertices[0].x())*(triangle3D->vertices[2].y() - triangle3D->vertices[0].y())
+		- (triangle3D->vertices[1].y() - triangle3D->vertices[0].y())*(triangle3D->vertices[2].x() - triangle3D->vertices[0].x()));
+	double areaX = qAbs((triangle3D->vertices[1].z() - triangle3D->vertices[0].z())*(triangle3D->vertices[2].y() - triangle3D->vertices[0].y())
+		- (triangle3D->vertices[1].y() - triangle3D->vertices[0].y())*(triangle3D->vertices[2].z() - triangle3D->vertices[0].z()));
+	double areaY = qAbs((triangle3D->vertices[1].z() - triangle3D->vertices[0].z())*(triangle3D->vertices[2].x() - triangle3D->vertices[0].x())
+		- (triangle3D->vertices[1].x() - triangle3D->vertices[0].x())*(triangle3D->vertices[2].z() - triangle3D->vertices[0].z()));
 
 	RTRVector2D vert1(2), vert2(2), vert3(2);
 
-	if (rangeY > rangeX&&rangeZ > rangeX)
+	if (areaX >= areaY&&areaX >= areaZ)
 	{
 		orthProjectDirection = 0;
 		vert1.x() = triangle3D->vertices[0].y();
@@ -53,7 +47,7 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		vert3.x() = triangle3D->vertices[2].y();
 		vert3.y() = triangle3D->vertices[2].z();
 	}
-	else if (rangeX > rangeZ&&rangeY > rangeZ)
+	else if (areaZ > areaX&&areaZ > areaY)
 	{
 		orthProjectDirection = 2;
 		vert1.x() = triangle3D->vertices[0].x();

@@ -164,7 +164,7 @@ RTRMatrix RTRMatrix::operator+ (const RTRMatrix& other) const
 	Q_ASSERT(data != NULL && other.data!=NULL);
 	Q_ASSERT(size == other.size);
 	RTRMatrix ret(rows, other.columns);
-	ret.fill(0);
+	//ret.fill(0);
 	for(int i=0;i<ret.rows;i++)
 	{
 		for(int j=0;j<ret.columns;j++)
@@ -179,7 +179,7 @@ RTRMatrix RTRMatrix::operator- (const RTRMatrix& other) const
 {
 	Q_ASSERT(size == other.size);
 	RTRMatrix ret(rows, other.columns);
-	ret.fill(0);
+	//ret.fill(0);
 	for(int i=0;i<ret.rows;i++)
 	{
 		for(int j=0;j<ret.columns;j++)
@@ -285,44 +285,6 @@ double RTRMatrix::vectorLengthSquared() const
 	}
 	return ret;
 }
-/*
-double& RTRMatrix::x()
-{
-	Q_ASSERT(isVector()&&size>=1);
-	return data[0];
-}
-
-double RTRMatrix::x() const
-{
-	Q_ASSERT(isVector()&&size>=1);
-	return data[0];
-}
-
-double& RTRMatrix::y()
-{
-	Q_ASSERT(isVector()&&size>=2);
-	return data[1];
-}
-
-double RTRMatrix::y() const
-{
-	Q_ASSERT(isVector()&&size>=2);
-	return data[1];
-}
-
-double& RTRMatrix::z()
-{
-	Q_ASSERT(isVector()&&size>=3);
-	return data[2];
-}
-
-double RTRMatrix::z() const
-{
-	Q_ASSERT(isVector()&&size>=3);
-	return data[2];
-}
-*/
-
 
 double RTRVector::dotProduct(const RTRMatrix &other) const
 {

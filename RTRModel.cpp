@@ -168,6 +168,10 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 				currentMaterial->setColorProperty("diffuse", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
 			else if (command == "map_kd")
 				currentMaterial->setTextureProperty("diffuse", modelPath + "/" + param[0]);
+			else if (command == "reflection_rate")
+			{
+				currentMaterial->setColorProperty("reflection_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+			}
 		}
 	}
 	if (currentMaterial != NULL)

@@ -9,11 +9,25 @@
 RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
-	model->loadModelFromObjFile(QString("D:\\Documents\\rubik.obj"));
+	model->loadModelFromObjFile(QString("D:\\Documents\\SimpleGlass.obj"));
 	//model->saveModelToObjFile(QString("D:\\RubikOutput.obj"));
 	//QApplication::exit();
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
+	renderer = new RTRRenderer(renderResult);
+	camera.cameraAngle = RTRVector(63.6, 0.6, 46.7);
+	//camera.cameraPosition = RTRVector(5.1, 2.6, 1.9);
+	camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
+	//camera.cameraAngle = RTRVector(83.6, 0.7, 117.9);
+	camera.focalLength = 1000;
+	camera.offset.x() = 400;
+	camera.offset.y() = 300;
+	//camera.focalLength = 500;
+	camera.evaluateRotationMatrix();
+	renderer->model = model;
+	renderer->camera = &camera;
+	connect(renderer, SIGNAL(renderStatusChanged()), this, SLOT(onRenderStatusChanged()));
+	renderer->render();
 }
 
 RTRViewer::~RTRViewer()
@@ -27,35 +41,35 @@ RTRViewer::~RTRViewer()
 void RTRViewer::paintEvent(QPaintEvent* event)
 {
 	static bool rendered = false;
-		QPainter painter(this);
-	if(rendered)
+	QPainter painter(this);
+	/*if(rendered)
 	{
 		painter.drawImage(0,0,*renderResult);
 		return;
 	}
 	rendered = true;
-	if(renderResult==NULL) return;
-
-	RTRCamera camera;
-	//camera.cameraAngle = RTRVector(63.6, 0.6, 46.7);
-	camera.cameraPosition = RTRVector(5.1, 2.6, 1.9);
-	//camera.cameraPosition = RTRVector(7.5, -6.5, 5.3);
-	camera.cameraAngle = RTRVector(83.6, 0.7, 117.9);
-	camera.focalLength = 400;
-	camera.offset.x() = 400;
-	camera.offset.y() = 300;
-	//camera.focalLength = 500;
-	//camera.offset.x() = 100;
-	//camera.offset.y() = 100;
-	camera.evaluateRotationMatrix();
-	RTRRenderer renderer(renderResult);
-	renderer.model = model;
-	renderer.camera = &camera;
-	renderer.render();
+	if(renderResult==NULL) return;*/
+	for (int i = 0; i < renderer->image->width(); i++)
+	{
+		for (int j = 0; j < renderer->image->height(); j++)
+		{
+			int pass = renderer->renderGridPass[i / 50][j / 50];
+			if (pass != 0)
+			{
+				renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass);
+			}
+			else renderer->renderPixel(i, j, 0, RTRColor());
+		}
+	}
 	painter.drawImage(0,0,*renderResult);
 }
 
 void RTRViewer::mousePressEvent(QMouseEvent * event)
 {
 
+}
+
+void RTRViewer::onRenderStatusChanged()
+{
+	repaint();
 }

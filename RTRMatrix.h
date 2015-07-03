@@ -51,12 +51,6 @@ public:
 	double vectorLength() const;
 	double vectorLengthSquared() const;
 	double dotProduct(const RTRMatrix& other) const;
-	/*double& x();
-	double x() const;
-	double& y();
-	double y() const;
-	double& z();
-	double z() const;*/
 	void printDebugInfo() const
 	{
 		cout << "[" <<endl;
@@ -73,10 +67,5 @@ public:
 };
 
 typedef RTRMatrix RTRVector;
-//typedef RTRMatrix RTRVector2D;
-//typedef RTRMatrix RTRVector3D;
-/*typedef RTRMatrix RTRColor;
-typedef RTRMatrix RTRColorRGB;
-typedef RTRMatrix RTRColorRGBA;*/
 
 #endif // RTRMATRIX_H

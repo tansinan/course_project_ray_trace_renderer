@@ -26,12 +26,12 @@
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{f7d7549a-d246-4ef3-b80d-d86494f3721f}</UniqueIdentifier>
+      <UniqueIdentifier>{f94acd9e-15d0-4e9a-a36b-2c7a54405139}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{8db12350-33c7-45a5-b5e5-18aaa0529e9b}</UniqueIdentifier>
+      <UniqueIdentifier>{86e56311-d172-4308-80b7-7cd838c6b2c4}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -41,6 +41,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RTRCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTRColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RTRGeometry.cpp">
@@ -64,7 +67,16 @@
     <ClCompile Include="RTRRenderElement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RTRRenderThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RTRRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTRVector2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTRVector3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RTRViewer.cpp">
@@ -79,20 +91,23 @@
     <ClCompile Include="Release\moc_MainWindow.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Debug\moc_RTRRenderThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RTRRenderThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RTRRenderer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RTRRenderer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
     <ClCompile Include="Debug\moc_RTRViewer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_RTRViewer.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="RTRColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RTRVector3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RTRVector2D.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +115,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="RTRCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RTRGeometry.h">
@@ -123,37 +141,35 @@
     <ClInclude Include="RTRModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RTRRenderElement.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RTRRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <CustomBuild Include="RTRViewer.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="RTRColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RTRModelObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RTRModelVertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RTRVector3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RTRVector2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RTRTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RTRModelPolygen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RTRModelVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRRenderElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="RTRRenderThread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RTRRenderer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="RTRTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRVector2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTRVector3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="RTRViewer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

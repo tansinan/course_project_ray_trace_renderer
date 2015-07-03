@@ -41,3 +41,8 @@ double RTRVector2D::y() const
 {
 	return elementAt(1);
 }
+
+double RTRVector2D::crossProduct(const RTRVector2D& other)
+{
+	return x()*other.y() - y()*other.x();
+}

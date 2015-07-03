@@ -8,16 +8,33 @@
 #include "RTRRenderElement.h"
 #include "RTRKdTree.h"
 
-class RTRRenderer
+class RTRRenderThread;
+
+class RTRRenderer :public QObject
 {
+	friend class RTRViewer;
+	Q_OBJECT
 public:
+	double searchTime = 0.0;
+	double processTime = 0.0;
 	RTRModel* model;
 	QVector<RTRRenderElement*> elements;
 	RTRKdTree* elementsCache;
 	RTRCamera* camera;
-	//由于启用了光线追踪，深度缓冲已被停用，但我依然会永远铭记它在调试过程中为我做出的巨大贡献。
-	//double* zBuffer;
 	QImage* image;
+protected:
+	RTRColor* renderResult;
+	RTRRenderThread** renderThreads;
+	int renderGridPass[16][12];
+	int currentPass;
+	int targetPass;
+protected:
+	void allocateTask(int threadId = -1);
+public slots:
+	void onRenderFinished(int threadId);
+	void onThreadFinished();
+signals:
+	void renderStatusChanged();
 public:
 	RTRRenderer(QImage* _image);
 	void render();

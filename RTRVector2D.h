@@ -15,6 +15,7 @@ public:
 	double x()const;
 	double& y();
 	double y() const;
+	double crossProduct(const RTRVector2D& other);
 };
 
 #endif

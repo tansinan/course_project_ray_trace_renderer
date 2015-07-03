@@ -24,13 +24,15 @@ protected:
 	};
 
 protected:
+	int nodeCount = 0;
 	Node* root;
 	RTRKdTree();
 
 protected:
 	void search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
 		RTRRay& originalRay, double& minZ, const RTRRenderElement* elementFrom) const;
-	static void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0, int maxDepth = 20);
+	void construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth = 0, int maxDepth = 20);
+	void cleanUp(Node* node);
 
 public:
 	static RTRKdTree* create(const QVector<RTRRenderElement*>& elementTable);

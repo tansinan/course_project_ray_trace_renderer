@@ -5,6 +5,7 @@
 #include "RTRMatrix.h"
 #include <QtGlobal>
 #include "RTRGeometry.h"
+#include <ctime>
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {

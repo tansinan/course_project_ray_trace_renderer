@@ -56,13 +56,11 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 
 	int splitMethod = -1;
 
-	/*for (int i = 0; i < elementTable.size(); i++)
+	for (int i = 0; i < elementTable.size(); i++)
 	{
-	if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
-	{
-	parent->data.append(elementTable[i]);
+		if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
+			parent->data.append(elementTable[i]);
 	}
-	}*/
 
 	for (int method = 0; method < 3; method++)
 	{
@@ -85,11 +83,11 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 		{
 			double valSmall = elementTable[i]->getBoundingBox().point1(method);
 			double valLarge = elementTable[i]->getBoundingBox().point2(method);
-			/*if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
+			if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
 			{
 			//parent->data.append(elementTable[i]);
 			continue;
-			}*/
+			}
 			if (valSmall < mid)
 			{
 				newTableSmall.append(elementTable[i]);
@@ -113,7 +111,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 		}
 	}
 
-	if (minDuplicate / (double)elementTable.size() > 0.6)
+	if (minDuplicate / (double)elementTable.size() > 0.5)
 	{
 		depth = maxDepth + 1;
 	}
@@ -127,6 +125,22 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 	//nodeSmall->splitMethod = nodeLarge->splitMethod = (parent->splitMethod+1) % 3;
 	construct(nodeSmall, bestNewTableSmall, depth + 1, maxDepth);
 	construct(nodeLarge, bestNewTableLarge, depth + 1, maxDepth);
+}
+
+void RTRKdTree::cleanUp(Node* node)
+{
+	if (node->large == NULL) return;
+	cleanUp(node->large);
+	cleanUp(node->small);
+	for (int i = 0; i < node->small->data.size(); i++)
+	{
+		if (node->large->data.removeAll(node->small->data[i]) > 0)
+		{
+			node->data.append(node->small->data[i]);
+		}
+		node->small->data.removeAt(i);
+		i--;
+	}
 }
 
 RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
@@ -158,7 +172,8 @@ RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 	ret->root = new Node();
 	ret->root->boundingBox = boundingBox;
 	ret->root->splitMethod = Node::SPLIT_BY_X;
-	construct(ret->root, elementTable, 0, maxDepth);
+	ret->construct(ret->root, elementTable, 0, maxDepth);
+	//ret->cleanUp(ret->root);
 	return ret;
 }
 
@@ -187,10 +202,7 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 		RTRVector3D temp;
 		if (node->data[i]->intersect(ray, temp))
 		{
-			if (sgn(ray.beginningPoint.y() - temp.y()) != sgn(ray.beginningPoint.y() - ray.endPoint.y()))
-			{
-				continue;
-			}
+			if (sgn(ray.beginningPoint.y() - temp.y()) != sgn(ray.beginningPoint.y() - ray.endPoint.y())) continue;
 			double zVal = abs(ray.beginningPoint.y() - temp.y());
 			if (zVal<minZ)
 			{
@@ -229,6 +241,14 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 	segmentLargeTemp.endPoint = segment.endPoint;
 	RTRVector midPoint = segment.pointAt(splitMethod, node->small->boundingBox.point2(splitMethod));
 	segmentSmallTemp.endPoint = segmentLargeTemp.beginningPoint = midPoint;
-	search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
-	search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
+	if (rand() % 2 == 0)
+	{
+		search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
+		search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
+	}
+	else
+	{
+		search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
+		search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
+	}
 }
