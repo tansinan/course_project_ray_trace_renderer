@@ -35,6 +35,7 @@ public slots:
 	void onThreadFinished();
 signals:
 	void renderStatusChanged();
+	void renderFinished();
 public:
 	RTRRenderer(QImage* _image);
 	void render();

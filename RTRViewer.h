@@ -27,6 +27,7 @@ public:
 signals:
 public slots :
 	void onRenderStatusChanged();
+	void onRenderFinished();
 };
 
 #endif // RTRVIEWER_H

@@ -91,3 +91,13 @@ double RTRColor::a() const
 {
 	return elementAt(3);
 }
+
+RTRColor RTRColor::operator *(const RTRColor& other)
+{
+	return RTRColor(r()*other.r(), g()*other.g(), b()*other.b(), a()*other.a());
+}
+
+RTRColor RTRColor::operator*(double ratio)
+{
+	return RTRColor(r()*ratio, g()*ratio, b()*ratio, a()*ratio);
+}

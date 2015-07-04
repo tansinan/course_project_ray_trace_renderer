@@ -48,6 +48,7 @@ bool RTRModel::loadModelFromObjFile(const QString& filePath)
 	QVector<RTRModelVertex*> tempVertexPositions;
 	QVector<RTRVector3D> tempVertexNormals;
 	QVector<RTRVector2D> tempVertexUVPositions;
+	bool currentSmoothShading = true;
 	while(!objModelStream.atEnd())
 	{
 		//Read a line, spaces and begin and end are trimmed
@@ -71,7 +72,8 @@ bool RTRModel::loadModelFromObjFile(const QString& filePath)
 		}
 		else if (command == "s")
 		{
-			//TODO : Smooth Shading Support 
+			if (param[0] == "off") currentSmoothShading = false;
+			else currentSmoothShading = true;
 		}
 		else if (command == "v")
 		{
@@ -93,6 +95,7 @@ bool RTRModel::loadModelFromObjFile(const QString& filePath)
 			poly->objectName = currentObjectName;
 			poly->groupName = currentGroupName;
 			poly->materialName = materialName;
+			poly->smoothShading = currentSmoothShading;
 			for (int i = 0; i < param.size(); i++)
 			{
 				QStringList list = param[i].split("/");
@@ -168,9 +171,21 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 				currentMaterial->setColorProperty("diffuse", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
 			else if (command == "map_kd")
 				currentMaterial->setTextureProperty("diffuse", modelPath + "/" + param[0]);
+			else if (command == "ka")
+				currentMaterial->setColorProperty("ambient", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			else if (command == "ks")
+				currentMaterial->setColorProperty("specular", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
 			else if (command == "reflection_rate")
 			{
 				currentMaterial->setColorProperty("reflection_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+			}
+			else if (command == "reflection_color")
+			{
+				currentMaterial->setColorProperty("reflection_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			}
+			else if (command == "reflection_glossiness")
+			{
+				currentMaterial->setColorProperty("reflection_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
 			}
 		}
 	}

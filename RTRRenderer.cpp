@@ -47,27 +47,13 @@ void RTRRenderer::render()
 				element->vertexUVMaps[1] = face->uvMaps[j];
 				element->vertexUVMaps[2] = face->uvMaps[j + 1];
 			}
-			//element->material = &material;
-			/*if (model->vertexNormals.size() > face.normals[j + 1] - 1 &&
-				model->vertexNormals.size() > face.normals[j] - 1 &&
-				model->vertexNormals.size() > face.normals[0] - 1)
+			element->useSmoothShading = face->smoothShading;
+			if (face->smoothShading)
 			{
-				element->useSmoothShading = true;
-				element->vertexNormals[0] = model->vertexNormals[face.normals[0] - 1];
-				element->vertexNormals[1] = model->vertexNormals[face.normals[j] - 1];
-				element->vertexNormals[2] = model->vertexNormals[face.normals[j + 1] - 1];
-			}*/
-			//else
-			{
-				element->useSmoothShading = false;
+				element->vertexNormals[0] = face->normals[0];
+				element->vertexNormals[1] = face->normals[j];
+				element->vertexNormals[2] = face->normals[j+1];
 			}
-			/*if (face.materialName == "") element->material = NULL;
-			else
-			{
-				element->material = model->materialLibrary[face.materialName];
-			}*/
-
-			//将三角形添加到需要渲染的三角形的列表之中
 			elements.append(element);
 		}
 	}
@@ -103,7 +89,7 @@ void RTRRenderer::render()
 		connect(renderThreads[i], SIGNAL(renderFinished(int)), this, SLOT(onRenderFinished(int)));
 	}
 	currentPass = 0;
-	targetPass = 100;
+	targetPass = 5;
 	for (int i = 0; i < 16; i++)
 	{
 		for (int j = 0; j < 12; j++)
@@ -144,7 +130,15 @@ void RTRRenderer::allocateTask(int threadId)
 	}
 	//currentPass++;
 	//TODO: this means render finished.
-	if (currentPass == targetPass) return;
+	if (currentPass >= targetPass)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (!renderThreads[i]->isFinished()) return;
+		}
+		emit renderFinished();
+		return;
+	}
 	currentPass++;
 	renderGridPass[0][0]++;
 	renderThreads[threadId]->start(0, 49, 0, 49);

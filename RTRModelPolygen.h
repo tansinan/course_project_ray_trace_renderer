@@ -12,6 +12,7 @@ public:
 	QString objectName;
 	QString groupName;
 	QString materialName;
+	bool smoothShading;
 	QVector<RTRModelVertex*> vertices;
 	QVector<RTRVector3D> normals;
 	QVector<RTRVector2D> uvMaps;
