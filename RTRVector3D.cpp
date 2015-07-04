@@ -13,9 +13,8 @@ RTRVector3D::RTRVector3D(double _x, double _y, double _z)
 	z() = _z;
 }
 
-RTRVector3D::RTRVector3D(const RTRMatrix& matrix)
+RTRVector3D::RTRVector3D(const RTRMatrix<3, 1>& matrix)
 {
-	Q_ASSERT(matrix.isVector() && matrix.getSize() == 3);
 	x() = matrix(0);
 	y() = matrix(1);
 	z() = matrix(2);

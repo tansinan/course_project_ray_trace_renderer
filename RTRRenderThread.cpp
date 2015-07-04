@@ -38,6 +38,12 @@ void RTRRenderThread::run()
 			//计算
 
 			RTRRay ray = RTRGeometry::invertProject(RTRVector2D(i + antiAliasOffsetX, j + antiAliasOffsetY), *renderer->camera);
+			ray.endPoint = ray.beginningPoint + (ray.endPoint - ray.beginningPoint) / 160;
+			RTRVector3D vec1 = renderer->camera->rotationMatrix * RTRVector3D(0, 1, 0);
+			RTRVector3D vec2 = renderer->camera->rotationMatrix * RTRVector3D(1, 0, 0);
+			ray.beginningPoint = ray.beginningPoint + vec1*(rand() / (double)RAND_MAX * 2.0 - 1.0);
+			ray.beginningPoint = ray.beginningPoint + vec2*(rand() / (double)RAND_MAX * 2.0 - 1.0);
+			ray = RTRRay(ray.beginningPoint, ray.endPoint, RTRRay::CREATE_FROM_POINTS);
 			result = renderRay(ray);
 			renderResult[i*renderer->image->height() + j] = result;
 		}
@@ -47,6 +53,7 @@ void RTRRenderThread::run()
 
 RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const RTRRenderElement* elementFrom)
 {
+	srand(rand() ^ clock());
 	int beginTime, endTime;
 	//RTRVector* vec3D = new RTRVector(3)[100];
 	//RTRLightPoint lightPoint(RTRVector(4.07625,1.00545,5.90386),RTRColor(1,1,1),7.5);
@@ -63,6 +70,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 	//如果光线不和任何物体相交那肯定是空无一物了……
 	if (intersectElement == NULL) return RTRColor(0.0, 0.0, 0.0);
 
+	//否则的话首先求交，并且计算直接漫反射照明。
 	RTRVector3D intersectPoint(0.0, 0.0, 0.0);
 	RTRVector3D intersectNormal(0.0, 0.0, 0.0);
 	RTRColor intersectColor(0.0, 0.0, 0.0);
@@ -74,51 +82,47 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		reflectionRate = intersectElement->material->getColorAt("reflection_rate", 0, 0).r();
 	}
 
-	//if (rand() / (double)RAND_MAX > reflectionRate)
-	//{
-		RTRColor diffuseColor(0.0, 0.0, 0.0);
-		double decay = lightPoint.directionAt(intersectPoint).dotProduct(intersectNormal);
-		int sym1 = sgn(decay);
-		int sym2 = sgn((intersectPoint - ray.beginningPoint).dotProduct(intersectNormal));
-		decay = decay > 0 ? decay : -decay;
-		if (sym1 == sym2)
-		{
-			RTRColor lightColor = lightPoint.colorAt(intersectPoint);
-			diffuseColor.r() = intersectColor.r()*lightColor.r()*decay;
-			diffuseColor.g() = intersectColor.g()*lightColor.g()*decay;
-			diffuseColor.b() = intersectColor.b()*lightColor.b()*decay;
-		}
-		else
-		{
-			diffuseColor.r() = 0.0;
-			diffuseColor.g() = 0.0;
-			diffuseColor.b() = 0.0;
-		}
-		//处理一般阴影
-		RTRRenderElement* directLight = NULL;
-		renderer->elementsCache->search(directLight, RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS), intersectElement);
-		if (directLight != NULL)
-		{
-			diffuseColor.r() = 0.0;
-			diffuseColor.g() = 0.0;
-			diffuseColor.b() = 0.0;
-		}
-		//return diffuseColor;
-	//}
-	//else
-	//{
+	RTRColor diffuseColor(0.0, 0.0, 0.0);
+	double decay = lightPoint.directionAt(intersectPoint).dotProduct(intersectNormal);
+	int sym1 = sgn(decay);
+	int sym2 = sgn((intersectPoint - ray.beginningPoint).dotProduct(intersectNormal));
+	decay = decay > 0 ? decay : -decay;
+	if (sym1 == sym2)
+	{
+		RTRColor lightColor = lightPoint.colorAt(intersectPoint);
+		diffuseColor.r() = intersectColor.r()*lightColor.r()*decay;
+		diffuseColor.g() = intersectColor.g()*lightColor.g()*decay;
+		diffuseColor.b() = intersectColor.b()*lightColor.b()*decay;
+	}
+	else
+	{
+		diffuseColor.r() = 0.0;
+		diffuseColor.g() = 0.0;
+		diffuseColor.b() = 0.0;
+	}
+
+	//处理阴影。
+	RTRRenderElement* directLight = NULL;
+	renderer->elementsCache->search(directLight, RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS), intersectElement);
+	if (directLight != NULL)
+	{
+		diffuseColor.r() = 0.0;
+		diffuseColor.g() = 0.0;
+		diffuseColor.b() = 0.0;
+	}
+
+	diffuseColor = diffuseColor + intersectColor * 0.2;
+
 	if (iterationCount < 5)
 	{
 		RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
-		reflectionDirection.x() *= (1 + (rand() % 10 - 5) / 100.0);
+		/*reflectionDirection.x() *= (1 + (rand() % 10 - 5) / 100.0);
 		reflectionDirection.y() *= (1 + (rand() % 10 - 5) / 100.0);
-		reflectionDirection.z() *= (1 + (rand() % 10 - 5) / 100.0);
+		reflectionDirection.z() *= (1 + (rand() % 10 - 5) / 100.0);*/
 		RTRRay reflectionRay(intersectPoint, reflectionDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-		RTRColor reflectionColor = renderRay(reflectionRay, iterationCount + 1, intersectElement);
-		//RTRRay reflectionRay(intersectPoint,reflectionDirection,RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-		//reflectionColor = renderRay(reflectionRay, iterationCount + 1, frontElement);
-		return reflectionColor * reflectionRate + diffuseColor * (1 - reflectionRate);
+			RTRColor reflectionColor = renderRay(reflectionRay, iterationCount + 1, intersectElement);
+			return reflectionColor * reflectionRate + diffuseColor * (1 - reflectionRate);
 	}
 	else
 	{

@@ -38,8 +38,6 @@ RTRVector3D RTRSegment::pointAt(int coordinate, double val) const
 
 RTRSegment2D::RTRSegment2D(const RTRVector2D &param1, const RTRVector2D& param2, int createMode)
 {
-	Q_ASSERT(param1.isVector()&&param1.getSize()==2);
-	Q_ASSERT(param2.isVector()&&param2.getSize()==2);
 	switch(createMode)
 	{
 	case CREATE_FROM_POINTS:

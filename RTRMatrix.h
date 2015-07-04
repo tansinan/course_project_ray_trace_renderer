@@ -103,7 +103,7 @@ public:
 		return ret;
 	}
 
-	bool isVector() const { return R == 1 && C == 1 };
+	bool isVector() const{ return R == 1 || C == 1; }
 	bool vectorNormalize()
 	{
 		Q_ASSERT(isVector());

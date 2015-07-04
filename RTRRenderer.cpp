@@ -103,7 +103,7 @@ void RTRRenderer::render()
 		connect(renderThreads[i], SIGNAL(renderFinished(int)), this, SLOT(onRenderFinished(int)));
 	}
 	currentPass = 0;
-	targetPass = 20;
+	targetPass = 100;
 	for (int i = 0; i < 16; i++)
 	{
 		for (int j = 0; j < 12; j++)
