@@ -23,6 +23,9 @@ protected:
 public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
+public slots:
+	void onRenderStatusChanged();
+
 };
 
 #endif // MAINWINDOW_H

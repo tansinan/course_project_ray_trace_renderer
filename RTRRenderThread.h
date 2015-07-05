@@ -22,7 +22,7 @@ public slots:
 
 protected:
 	virtual void run() Q_DECL_OVERRIDE;
-	RTRColor renderRay(const RTRRay& ray, int iterationCount = 0, const RTRRenderElement* elementFrom = NULL);
+	RTRColor renderRay(const RTRRay& ray, int iterationCount = 0, const RTRRenderElement* elementFrom = NULL, double refracInAir = true);
 
 signals:
 	void renderFinished(int _threadIndex);

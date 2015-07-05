@@ -23,6 +23,7 @@ protected:
 	QImage* renderResult;
 public:
 	explicit RTRViewer(QWidget *parent = 0);
+	RTRRenderer* getRenderer();
 	~RTRViewer();
 signals:
 public slots :

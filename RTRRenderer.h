@@ -22,7 +22,7 @@ public:
 	RTRKdTree* elementsCache;
 	RTRCamera* camera;
 	QImage* image;
-protected:
+public:
 	RTRColor* renderResult;
 	RTRRenderThread** renderThreads;
 	int renderGridPass[16][12];

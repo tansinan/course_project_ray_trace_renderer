@@ -2,6 +2,7 @@
 #include "RTRModel.h"
 #include "RTRCamera.h"
 #include "RTRRenderer.h"
+#include "MainWindow.h"
 #include <QPainter>
 #include <QDebug>
 #include <QApplication>
@@ -9,15 +10,16 @@
 RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 {
 	model = new RTRModel();
+	//model->loadModelFromObjFile(QString("D:\\Documents\\SimpleGlass2.obj"));
 	model->loadModelFromObjFile(QString("D:\\Documents\\FinalProject.obj"));
-	//model->saveModelToObjFile(QString("D:\\RubikOutput.obj"));
-	//QApplication::exit();
 	setFixedSize(800,600);
 	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
 	renderer = new RTRRenderer(renderResult);
-	//camera.cameraAngle = RTRVector3D(63.6, 0.6, 46.7);
+	/*camera.cameraAngle = RTRVector3D(63.6, 0.6, 46.7);
+	camera.cameraPosition = RTRVector3D(7.5, -6.5, 5.3);
+	camera.focalLength = 1000;*/
+
 	camera.cameraPosition = RTRVector3D(5.1, 2.6, 1.9);
-	//camera.cameraPosition = RTRVector3D(7.5, -6.5, 5.3);
 	camera.cameraAngle = RTRVector3D(83.6, 0.7, 117.9);
 	camera.focalLength = 600;
 	camera.offset.x() = 400;
@@ -27,6 +29,7 @@ RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
 	renderer->model = model;
 	renderer->camera = &camera;
 	connect(renderer, SIGNAL(renderStatusChanged()), this, SLOT(onRenderStatusChanged()));
+	connect(renderer, SIGNAL(renderStatusChanged()), ((MainWindow*)this->parent()), SLOT(onRenderStatusChanged()));
 	connect(renderer, SIGNAL(renderFinished()), this, SLOT(onRenderFinished()));
 	renderer->render();
 }
@@ -90,4 +93,9 @@ void RTRViewer::onRenderFinished()
 		}
 	}
 	renderer->image->save("MyRenderResult.bmp");
+}
+
+RTRRenderer* RTRViewer::getRenderer()
+{
+	return renderer;
 }
