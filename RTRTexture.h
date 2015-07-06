@@ -11,8 +11,8 @@ public:
 	RTRColor valueAt(double u, double v)
 	{
 		Q_ASSERT(u >= 0.0&&v >= 0.0&&u <= 1.0&&v <= 1.0);
-		int x = qRound(u*image->width() - 1);
-		int y = qRound(v*image->height() - 1);
+		int x = qRound(u*(image->width() - 1));
+		int y = qRound(v*(image->height() - 1));
 		if (!image->isNull())
 		{
 			QRgb color = image->pixel(x, y);

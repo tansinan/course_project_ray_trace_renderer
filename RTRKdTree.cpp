@@ -187,8 +187,9 @@ void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const
 	}
 	double minZ = 1e10;
 	searchResult = NULL;
-	search(root, searchResult, RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS), 
-		RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS), minZ, elementFrom);
+	RTRSegment temp1 =  RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
+	RTRSegment temp2 =  RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
+	search(root, searchResult,temp1,temp2, minZ, elementFrom);
 }
 
 void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
@@ -203,7 +204,7 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 		if (node->data[i]->intersect(ray, temp))
 		{
 			if (sgn(ray.beginningPoint.y() - temp.y()) != sgn(ray.beginningPoint.y() - ray.endPoint.y())) continue;
-			double zVal = abs(ray.beginningPoint.y() - temp.y());
+			double zVal = qAbs(ray.beginningPoint.y() - temp.y());
 			if (zVal<minZ)
 			{
 				minZ = zVal;
@@ -241,7 +242,7 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
 	segmentLargeTemp.endPoint = segment.endPoint;
 	RTRVector3D midPoint = segment.pointAt(splitMethod, node->small->boundingBox.point2(splitMethod));
 	segmentSmallTemp.endPoint = segmentLargeTemp.beginningPoint = midPoint;
-	if (rand() % 2 == 0)
+	if (qrand() % 2 == 0)
 	{
 		search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
 		search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);

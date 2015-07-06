@@ -25,7 +25,6 @@ public:
 public:
 	bool loadModelFromObjFile(const QString& filePath);
 	bool loadMaterialLibraryFromMtlFile(const QString& filePath);
-	bool saveModelToObjFile(const QString& filePath);
 	RTRModelVertex* addVertex(const RTRVector3D& coordinate);
 	RTRModelVertex* addVertex(double _x, double _y, double _z);
 	RTRModelPolygen* addPolygen(const QVector<RTRModelVertex*>& vertices);

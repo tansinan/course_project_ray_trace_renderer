@@ -15,9 +15,12 @@ RTRRenderer::RTRRenderer(QImage *_image)
 	renderResult = new RTRColor[image->width()*image->height()];
 }
 
-void RTRRenderer::render()
+bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
 {
-	if(model == NULL || camera == NULL) return;
+	if (pass <= 0) return false;
+	if (_model == NULL || _camera == NULL) return false;
+	model = _model;
+	camera = _camera;
 
 	//扫描所有需要渲染的多边形
 	foreach(const RTRModelPolygen* face, model->polygens)
@@ -61,26 +64,6 @@ void RTRRenderer::render()
 	//创建Kd树以便加速搜索。
 	elementsCache = RTRKdTree::create(elements);
 
-	//遍历所有的像素点，从它们发出光线并计算渲染结果。
-	/*for(int i=0;i<image->width();i++)
-	{
-		for(int j=0;j<image->height();j++)
-		{
-			RTRColor result(0.0, 0.0, 0.0);
-			for (int pass = 0; pass < 1; pass++)
-			{
-				RTRRay ray = RTRGeometry::invertProject(RTRVector2D(i, j), *camera);
-				RTRColor color = renderRay(ray);
-				result = result + color;
-			}
-			result = result / 1.0;
-			renderPixel(i,j,0,result);
-		}
-	}
-	int endTime = clock();
-	qDebug() << ((float)endTime - beginTime)/CLOCKS_PER_SEC;
-	qDebug() << "Search:" << searchTime;*/
-
 	renderThreads = new RTRRenderThread*[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -89,7 +72,7 @@ void RTRRenderer::render()
 		connect(renderThreads[i], SIGNAL(renderFinished(int)), this, SLOT(onRenderFinished(int)));
 	}
 	currentPass = 0;
-	targetPass = 150;
+	targetPass = pass;
 	for (int i = 0; i < 16; i++)
 	{
 		for (int j = 0; j < 12; j++)
@@ -98,6 +81,7 @@ void RTRRenderer::render()
 		}
 	}
 	allocateTask();
+	return true;
 }
 
 void RTRRenderer::renderPixel(int x, int y, double z, const RTRColor& color)
@@ -120,7 +104,7 @@ void RTRRenderer::allocateTask(int threadId)
 	{
 		for (int j = 0; j < 12; j++)
 		{
-			if (renderGridPass[i][j] <= currentPass)
+			if (renderGridPass[i][j] < currentPass)
 			{
 				renderGridPass[i][j]++;
 				renderThreads[threadId]->start(50 * i, 50 * i + 49, 50 * j, 50 * j + 49);
@@ -160,5 +144,5 @@ void RTRRenderer::onThreadFinished()
 		}
 	}
 	allocateTask(thread->threadIndex);
-	if(rand()%10==0) emit renderStatusChanged();
+	emit renderStatusChanged();
 }

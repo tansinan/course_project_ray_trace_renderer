@@ -12,35 +12,14 @@ void RTRCamera::evaluateRotationMatrix()
 	rotationMatrix = RTRGeometry::rotationMatrix(cameraAngle.x(),cameraAngle.y(),cameraAngle.z());
 	inverseRotationMatrix
 			= RTRGeometry::inverseRotationMatrix(cameraAngle.x(),cameraAngle.y(),cameraAngle.z());
-	/*RTRMatrix rotateX(3,3), rotateY(3,3), rotateZ(3,3);
-	rotateX.fill(0);
-	rotateX(0, 0) = 1;
-	rotateX(2,2) = rotateX(1, 1) = qCos(qDegreesToRadians(cameraAngle.x()));
-	rotateX(1,2) = qSin(qDegreesToRadians(cameraAngle.x()));
-	rotateX(2,1) = -rotateX(1,2);
-
-	rotateY.fill(0);
-	rotateY(1, 1) = 1;
-	rotateY(0,0) = rotateY(2, 2) = qCos(qDegreesToRadians(cameraAngle.y()));
-	rotateY(2,0) = qSin(qDegreesToRadians(cameraAngle.y()));
-	rotateY(0,2) = -rotateY(2,0);
-
-	rotateZ.fill(0);
-	rotateZ(2, 2) = 1;
-	rotateZ(0, 0) = rotateZ(1, 1) = qCos(qDegreesToRadians(cameraAngle.z()));
-	rotateZ(0, 1) = qSin(qDegreesToRadians(cameraAngle.z()));
-	rotateZ(1, 0) = -rotateZ(0, 1);
-	rotationMatrix = rotateX*rotateY*rotateZ;*/
 }
 
 RTRVector2D RTRCamera::transformPoint(RTRVector3D point) const
 {
 	RTRVector2D ret;
 	RTRVector3D relativePosition = rotationMatrix*(point-cameraPosition);
-	//rotationMatrix.printDebugInfo();
-	//qDebug() << ret.x() << ret.y() << ret.z();
-	ret.x() = - relativePosition.x()/relativePosition.z()*focalLength;
-	ret.y() = -  relativePosition.y()/relativePosition.z()*focalLength;
+	ret.x() = - relativePosition.x()/relativePosition.z()*imageDistance;
+	ret.y() = -  relativePosition.y()/relativePosition.z()*imageDistance;
 	ret = ret + offset;
 	return ret;
 }
@@ -48,9 +27,7 @@ RTRVector2D RTRCamera::transformPoint(RTRVector3D point) const
 RTRSegment RTRCamera::inverseProject(RTRVector2D point) const
 {
 	point = point - offset;
-	//RTRVector point1(point.x()/focalLength,point.y()/focalLength,-1);
-	RTRVector3D point2(point.x(),point.y(),-focalLength);
-	//point1 = inverseRotationMatrix * point1;
+	RTRVector3D point2(point.x(),point.y(),-imageDistance);
 	point2 = inverseRotationMatrix * point2;
 	point2 = point2 + cameraPosition;
 	return RTRSegment(cameraPosition, point2, RTRSegment::CREATE_FROM_POINTS);

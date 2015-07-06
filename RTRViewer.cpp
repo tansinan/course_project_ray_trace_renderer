@@ -3,69 +3,31 @@
 #include "RTRCamera.h"
 #include "RTRRenderer.h"
 #include "MainWindow.h"
+#include "RTRRenderThread.h"
 #include <QPainter>
 #include <QDebug>
 #include <QApplication>
+#include <ctime>
 
-RTRViewer::RTRViewer(QWidget *parent) : QWidget(parent)
+RTRViewer::RTRViewer(QWidget *parent, RTRRenderer* _renderer)
+	:QWidget(parent)
 {
-	model = new RTRModel();
-	//model->loadModelFromObjFile(QString("D:\\Documents\\SimpleGlass2.obj"));
-	model->loadModelFromObjFile(QString("D:\\Documents\\FinalProject.obj"));
+	renderer = _renderer;
 	setFixedSize(800,600);
-	renderResult =  new QImage(800, 600, QImage::Format_ARGB32);
-	renderer = new RTRRenderer(renderResult);
-	/*camera.cameraAngle = RTRVector3D(63.6, 0.6, 46.7);
-	camera.cameraPosition = RTRVector3D(7.5, -6.5, 5.3);
-	camera.focalLength = 1000;*/
-
-	camera.cameraPosition = RTRVector3D(5.1, 2.6, 1.9);
-	camera.cameraAngle = RTRVector3D(83.6, 0.7, 117.9);
-	camera.focalLength = 600;
-	camera.offset.x() = 400;
-	camera.offset.y() = 300;
-	//camera.focalLength = 500;
-	camera.evaluateRotationMatrix();
-	renderer->model = model;
-	renderer->camera = &camera;
-	connect(renderer, SIGNAL(renderStatusChanged()), this, SLOT(onRenderStatusChanged()));
-	connect(renderer, SIGNAL(renderStatusChanged()), ((MainWindow*)this->parent()), SLOT(onRenderStatusChanged()));
-	connect(renderer, SIGNAL(renderFinished()), this, SLOT(onRenderFinished()));
-	renderer->render();
 }
 
 RTRViewer::~RTRViewer()
 {
-	qDebug() << "Destructor called!" <<endl;
-	delete model;
-	delete renderResult;
-	renderResult = NULL;
 }
 
 void RTRViewer::paintEvent(QPaintEvent* event)
 {
 	static bool rendered = false;
 	QPainter painter(this);
-	/*if(rendered)
+	if(renderer->image!=NULL)
 	{
-		painter.drawImage(0,0,*renderResult);
-		return;
+		painter.drawImage(0,0,*renderer->image);
 	}
-	rendered = true;
-	if(renderResult==NULL) return;*/
-	for (int i = 0; i < renderer->image->width(); i++)
-	{
-		for (int j = 0; j < renderer->image->height(); j++)
-		{
-			int pass = renderer->renderGridPass[i / 50][j / 50];
-			if (pass != 0)
-			{
-				renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass);
-			}
-			else renderer->renderPixel(i, j, 0, RTRColor());
-		}
-	}
-	painter.drawImage(0,0,*renderResult);
 }
 
 void RTRViewer::mousePressEvent(QMouseEvent * event)
@@ -73,13 +35,14 @@ void RTRViewer::mousePressEvent(QMouseEvent * event)
 
 }
 
-void RTRViewer::onRenderStatusChanged()
+void RTRViewer::updateDisplay(bool forced)
 {
-	repaint();
-}
-
-void RTRViewer::onRenderFinished()
-{
+	static int lastUpdate = 0;
+	if(clock() - lastUpdate < CLOCKS_PER_SEC/8 && !forced)
+	{
+		return;
+	}
+	lastUpdate = clock();
 	for (int i = 0; i < renderer->image->width(); i++)
 	{
 		for (int j = 0; j < renderer->image->height(); j++)
@@ -92,10 +55,28 @@ void RTRViewer::onRenderFinished()
 			else renderer->renderPixel(i, j, 0, RTRColor());
 		}
 	}
-	renderer->image->save("MyRenderResult.bmp");
-}
-
-RTRRenderer* RTRViewer::getRenderer()
-{
-	return renderer;
+	for(int k=0;k<8;k++)
+	{
+		if(forced) break;
+		if(renderer->renderThreads[k]->isFinished()) continue;
+		for(int i =renderer->renderThreads[k]->xBegin,ii=0;i<=renderer->renderThreads[k]->xEnd;i++,ii++)
+		{
+			for(int j =renderer->renderThreads[k]->yBegin,jj=0;j<=renderer->renderThreads[k]->yEnd;j++,jj++)
+			{
+				int pass = renderer->renderGridPass[i / 50][j / 50];
+				if(ii<8||ii>42||jj<8||jj>42)
+				{
+					if (pass != 0) renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass * 2
+							+ RTRColor(0.25,0.25,0.25));
+					else renderer->renderPixel(i, j, 0, RTRColor());
+				}
+				else
+				{
+					if (pass != 0) renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass / 2);
+					else renderer->renderPixel(i, j, 0, RTRColor());
+				}
+			}
+		}
+	}
+	repaint();
 }

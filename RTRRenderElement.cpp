@@ -23,8 +23,8 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			boundingBox.point1(j) = std::min(triangle3D->vertices[i](j), boundingBox.point1(j));
-			boundingBox.point2(j) = std::max(triangle3D->vertices[i](j), boundingBox.point2(j));
+			boundingBox.point1(j) = qMin(triangle3D->vertices[i](j), boundingBox.point1(j));
+			boundingBox.point2(j) = qMax(triangle3D->vertices[i](j), boundingBox.point2(j));
 		}
 	}
 
@@ -104,27 +104,27 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 	{
 		double det = line13.y() * line12.z() - line12.y() * line13.z();
 		a2 = line1p.y() * line13.z() - line13.y() * line1p.z();
-		a2 = abs(a2 / det);
+		a2 = qAbs(a2 / det);
 		a3 = line1p.y() * line12.z() - line12.y() * line1p.z();
-		a3 = abs(a3 / det);
+		a3 = qAbs(a3 / det);
 		a1 = 1 - a2 - a3;
 	}
 	else if (orthProjectDirection == 1)
 	{
 		double det = line13.x() * line12.z() - line12.x() * line13.z();
 		a2 = line1p.x() * line13.z() - line13.x() * line1p.z();
-		a2 = abs(a2 / det);
+		a2 = qAbs(a2 / det);
 		a3 = line1p.x() * line12.z() - line12.x() * line1p.z();
-		a3 = abs(a3 / det);
+		a3 = qAbs(a3 / det);
 		a1 = 1 - a2 - a3;
 	}
 	else if (orthProjectDirection == 2)
 	{
 		double det = line13.x() * line12.y() - line12.x() * line13.y();
 		a2 = line1p.x() * line13.y() - line13.x() * line1p.y();
-		a2 = abs(a2 / det);
+		a2 = qAbs(a2 / det);
 		a3 = line1p.x() * line12.y() - line12.x() * line1p.y();
-		a3 = abs(a3 / det);
+		a3 = qAbs(a3 / det);
 		a1 = 1 - a2 - a3;
 	}
 

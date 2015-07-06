@@ -99,7 +99,7 @@ void RTRSegment2D::reset(const RTRVector2D &param1, const RTRVector2D& param2, i
 
 int RTRSegment2D::pointSign(const RTRVector2D& point) const
 {
-	if((!std::isinf(slopeY)) && (!std::isnan(slopeY))/* && abs(slopeY )< 1.0e10*/)
+	if((!std::isinf(slopeY)) && (!std::isnan(slopeY)))
 	{
 		return point.y() > point.x()*slopeY + intersectY ? 1 : -1;
 	}

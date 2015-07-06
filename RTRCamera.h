@@ -26,7 +26,7 @@ public:
 	/**
 	* @brief focalLength表示相机的焦距
 	*/
-	double focalLength;
+	double imageDistance;
 
 	/**
 	* @brief offset是一个二维向量，表示图像的位置偏移,offset与透视效应无关。

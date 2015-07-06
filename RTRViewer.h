@@ -22,13 +22,9 @@ protected:
 	void mousePressEvent(QMouseEvent * event);
 	QImage* renderResult;
 public:
-	explicit RTRViewer(QWidget *parent = 0);
-	RTRRenderer* getRenderer();
+	RTRViewer(QWidget *parent, RTRRenderer* _renderer);
+	void updateDisplay(bool forced = false);
 	~RTRViewer();
-signals:
-public slots :
-	void onRenderStatusChanged();
-	void onRenderFinished();
 };
 
 #endif // RTRVIEWER_H

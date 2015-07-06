@@ -77,7 +77,9 @@ QColor RTRColor::toQtColor() const
 	else if (b()>1) ret.setBlueF(1.0);
 	else ret.setBlueF(b());
 
-	if (a() < 1.0) ret.setAlphaF(a());
+	if (a()<0) ret.setAlphaF(0);
+	else if (a()>1.0) ret.setAlphaF(1.0);
+	else ret.setAlphaF(a());
 
 	return ret;
 }

@@ -193,6 +193,12 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 				currentMaterial->setColorProperty("fod_aperture", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
 			else if (command == "fod_focus")
 				currentMaterial->setColorProperty("fod_focus", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+			else if (command == "camera_position")
+				currentMaterial->setColorProperty("camera_position", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			else if (command == "camera_angle")
+				currentMaterial->setColorProperty("camera_angle", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+			else if (command == "image_distance")
+				currentMaterial->setColorProperty("image_distance", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
 		}
 	}
 	if (currentMaterial != NULL)
@@ -201,33 +207,6 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 	}
 	mtlFile.close();
 	return true;
-}
-
-bool RTRModel::saveModelToObjFile(const QString& filePath)
-{
-	return false;
-	/*QFile objOutputFile(filePath);
-	if (!objOutputFile.open(QIODevice::WriteOnly))
-	{
-		return false;
-	}
-	QTextStream objOutputStream(&objOutputFile);
-	for (int i = 0; i < vertexPositions.size(); i++)
-	{
-		objOutputStream << "v " << vertexPositions[i].x() << " " << vertexPositions[i].y() << " " << vertexPositions[i].z() << "\n";
-	}
-	for (int i = 0; i < faces.size(); i++)
-	{
-		objOutputStream << "f ";
-		for (int j = 0; j < faces[i].vertices.size(); j++)
-		{
-			objOutputStream << faces[i].vertices[j] << " ";
-		}
-		objOutputStream << "\n";
-		//<< faces[i].vertices[]
-	}
-	objOutputFile.close();
-	return false;*/
 }
 
 RTRModelPolygen* RTRModel::addPolygen(const QVector<RTRModelVertex*>& vertices)

@@ -23,8 +23,7 @@ void RTRRenderThread::start(int _xBegin, int _xEnd, int _yBegin, int _yEnd)
 
 void RTRRenderThread::run()
 {
-	srand(clock());
-	qDebug() << "Task Accepted:" << "(" << xBegin << "," << yBegin << ")" << "(" << xEnd << "," << yEnd << ")";
+	qsrand(clock()^time(0));
 	double apertureSize = 0.0;
 	double focus = 0.0;
 	if (renderer->model->materialLibrary.find("@@world") != renderer->model->materialLibrary.end())
@@ -43,22 +42,22 @@ void RTRRenderThread::run()
 			RTRColor result(0.0, 0.0, 0.0);
 
 			//为了实现Anti-alias进行的对于光屏上点的采样随机化处理
-			double antiAliasOffsetX = (rand() / (double)RAND_MAX - 0.5);
-			double antiAliasOffsetY = (rand() / (double)RAND_MAX - 0.5);
+			double antiAliasOffsetX = (qrand() / (double)RAND_MAX - 0.5);
+			double antiAliasOffsetY = (qrand() / (double)RAND_MAX - 0.5);
 
 			//计算
 
 			RTRRay ray = RTRGeometry::invertProject(RTRVector2D(i + antiAliasOffsetX, j + antiAliasOffsetY), *renderer->camera);
 			if (apertureSize > 0.0000001 && focus > 0.0000001)
 			{
-				ray.endPoint = ray.beginningPoint + (ray.endPoint - ray.beginningPoint) / (renderer->camera->focalLength / focus);
+				ray.endPoint = ray.beginningPoint + (ray.endPoint - ray.beginningPoint) / (renderer->camera->imageDistance / focus);
 				RTRVector3D vec1 = renderer->camera->rotationMatrix * RTRVector3D(0, 1, 0);
 				RTRVector3D vec2 = renderer->camera->rotationMatrix * RTRVector3D(1, 0, 0);
 				double apertureOffsetX, apertureOffsetY;
 				for (;;)
 				{
-					apertureOffsetX = (rand() / (double)RAND_MAX * 2 * apertureSize - apertureSize);
-					apertureOffsetY = (rand() / (double)RAND_MAX * 2 * apertureSize - apertureSize);
+					apertureOffsetX = (qrand() / (double)RAND_MAX * 2 * apertureSize - apertureSize);
+					apertureOffsetY = (qrand() / (double)RAND_MAX * 2 * apertureSize - apertureSize);
 					if (apertureOffsetX*apertureOffsetX + apertureOffsetY*apertureOffsetY < apertureSize*apertureSize)
 						break;
 				}
@@ -75,7 +74,7 @@ void RTRRenderThread::run()
 
 RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const RTRRenderElement* elementFrom, double refracInAir)
 {
-	srand(rand() ^ (clock() + time(0)));
+	qsrand(qrand() ^ (clock() + time(0)));
 
 	RTRColor mtlWorldAmbient;
 	if (renderer->model->materialLibrary.find("@@world") != renderer->model->materialLibrary.end())
@@ -88,8 +87,8 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 	}
 
 	//面光源的随机采样
-	RTRLightPoint lightPoint(RTRVector3D(2.3 + (rand() / (double)RAND_MAX * 2 - 1)
-		, -0.9 + (rand() / (double)RAND_MAX * 2 - 1)
+	RTRLightPoint lightPoint(RTRVector3D(2.3 + (qrand() / (double)RAND_MAX * 2 - 1)
+		, -0.9 + (qrand() / (double)RAND_MAX * 2 - 1)
 		, 6.7), RTRColor(1, 1, 1), 7.5);
 
 	//求交元素
@@ -158,7 +157,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		diffuseColor = intersectColor * lightColor * decay;
 		RTRVector3D specularDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
 		specularDirection.vectorNormalize();
-		double spec = specularDirection.dotProduct(lightDirection);
+		double spec = qAbs(specularDirection.dotProduct(lightDirection));
 		specColor = mtlSpecColor*lightColor*qPow(spec, 2);
 	}
 
@@ -182,9 +181,9 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
 		if (mtlReflGloss < 0.99999)
 		{
-			reflectionDirection.x() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
-			reflectionDirection.y() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
-			reflectionDirection.z() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
+			reflectionDirection.x() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
+			reflectionDirection.y() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
+			reflectionDirection.z() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
 		}
 		RTRRay reflectionRay(intersectPoint, reflectionDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
 		RTRColor reflectionColor = renderRay(reflectionRay, iterationCount + 1, intersectElement)*mtlReflColor;
@@ -196,9 +195,9 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		RTRVector3D refractionNormal = intersectNormal;
 		if (mtlRefracGloss < 0.99999)
 		{
-			refractionNormal.x() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
-			refractionNormal.y() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
-			refractionNormal.z() *= (1 + (rand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
+			refractionNormal.x() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
+			refractionNormal.y() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
+			refractionNormal.z() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlRefracGloss));
 		}
 		if (refractionNormal.dotProduct(ray.direction) > 0) refractionNormal = refractionNormal * (-1);
 		double c = -ray.direction.dotProduct(refractionNormal);
