@@ -1,6 +1,6 @@
 #include "RTRRenderThread.h"
 #include "RTRRenderer.h"
-#include "Light\RTRLightPoint.h"
+#include "Light/RTRLightPoint.h"
 #include <QImage>
 #include <qdebug.h>
 #include <ctime>
@@ -41,11 +41,11 @@ void RTRRenderThread::run()
 		{
 			RTRColor result(0.0, 0.0, 0.0);
 
-			//ÎªÁËÊµÏÖAnti-alias½øÐÐµÄ¶ÔÓÚ¹âÆÁÉÏµãµÄ²ÉÑùËæ»ú»¯´¦Àí
+			//Îªï¿½ï¿½Êµï¿½ï¿½Anti-aliasï¿½ï¿½ï¿½ÐµÄ¶ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			double antiAliasOffsetX = (qrand() / (double)RAND_MAX - 0.5);
 			double antiAliasOffsetY = (qrand() / (double)RAND_MAX - 0.5);
 
-			//¼ÆËã
+			//ï¿½ï¿½ï¿½ï¿½
 
 			RTRRay ray = RTRGeometry::invertProject(RTRVector2D(i + antiAliasOffsetX, j + antiAliasOffsetY), *renderer->camera);
 			if (apertureSize > 0.0000001 && focus > 0.0000001)
@@ -86,25 +86,25 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		}
 	}
 
-	//Ãæ¹âÔ´µÄËæ»ú²ÉÑù
-	RTRLightPoint lightPoint(RTRVector3D(2.3 + (qrand() / (double)RAND_MAX * 2 - 1)
-		, -0.9 + (qrand() / (double)RAND_MAX * 2 - 1)
-		, 6.7), RTRColor(1, 1, 1), 7.5);
+	//ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    RTRLightPoint lightPoint(RTRVector3D(-2.0 + (qrand() / (double)RAND_MAX * 2 - 1)
+        , 0 + (qrand() / (double)RAND_MAX * 2 - 1)
+        , 5.0), RTRColor(1, 1, 1), 7.5);
 
-	//Çó½»ÔªËØ
+	//ï¿½ï¿½ï¿½ï¿½Ôªï¿½ï¿½
 	RTRRenderElement* intersectElement = NULL;
 	renderer->elementsCache->search(intersectElement, ray, elementFrom);
 
-	//Èç¹û¹âÏß²»ºÍÈÎºÎÎïÌåÏà½»ÄÇ¿Ï¶¨ÊÇ¿ÕÎÞÒ»ÎïÁË¡­¡­
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à½»ï¿½Ç¿Ï¶ï¿½ï¿½Ç¿ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ë¡ï¿½ï¿½ï¿½
 	if (intersectElement == NULL) return mtlWorldAmbient;
 
-	//·ñÔòµÄ»°Ê×ÏÈÇó½»£¬²¢ÇÒ¼ÆËãÖ±½ÓÂþ·´ÉäÕÕÃ÷¡£
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó½»£ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	RTRVector3D intersectPoint(0.0, 0.0, 0.0);
 	RTRVector3D intersectNormal(0.0, 0.0, 0.0);
 	RTRColor intersectColor(0.0, 0.0, 0.0);
 	intersectElement->intersect(ray, intersectPoint, intersectNormal, intersectColor);
 
-	//²éÕÒÎïÌåµÄ²ÄÖÊÊôÐÔ£¬°üÀ¨·´ÉäÂÊºÍ·´ÉäÑÕÉ«¡¢¸ß¹â¡¢ÕÛÉäÂÊµÈ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊºÍ·ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ß¹â¡¢ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½
 	double reflectionRate = 0.0;
 	RTRColor mtlReflColor(1.0, 1.0, 1.0);
 	double mtlReflGloss = 1.0;
@@ -114,7 +114,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 	RTRColor mtlRefracColor(1.0, 1.0, 1.0);
 	double mtlRefracGloss = 1.0;
 
-	//¾µÃæ·´ÉäÏà¹ØÊôÐÔ
+    //å¤„ç†åå°„ç›¸å…³å±žæ€§
 	if (intersectElement->material->getPropertyType("reflection_rate") == RTRMaterial::TYPE_COLOR)
 		reflectionRate = intersectElement->material->getColorAt("reflection_rate", 0, 0).r();
 	if (intersectElement->material->getPropertyType("reflection_color") == RTRMaterial::TYPE_COLOR)
@@ -122,11 +122,11 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 	if (intersectElement->material->getPropertyType("reflection_glossiness") == RTRMaterial::TYPE_COLOR)
 		mtlReflGloss = intersectElement->material->getColorAt("reflection_glossiness", 0, 0).r();
 
-	//¸ß¹âÏà¹ØÊôÐÔ
+	//ï¿½ß¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (intersectElement->material->getPropertyType("specular") == RTRMaterial::TYPE_COLOR)
 		mtlSpecColor = intersectElement->material->getColorAt("specular", 0, 0);
 
-	//ÕÛÉäÏà¹ØÊôÐÔ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (intersectElement->material->getPropertyType("refraction_rate") == RTRMaterial::TYPE_COLOR)
 		mtlRefracRate = intersectElement->material->getColorAt("refraction_rate", 0, 0).r();
 	if (intersectElement->material->getPropertyType("refraction_index") == RTRMaterial::TYPE_COLOR)
@@ -135,7 +135,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		mtlRefracColor = intersectElement->material->getColorAt("refraction_color", 0, 0);
 	if (intersectElement->material->getPropertyType("refraction_glossiness") == RTRMaterial::TYPE_COLOR)
 		mtlRefracGloss = intersectElement->material->getColorAt("refraction_glossiness", 0, 0).r();
-	
+
 
 	RTRColor mtlAmbientColor;
 	if (intersectElement->material->getPropertyType("ambient") == RTRMaterial::TYPE_COLOR)
@@ -161,7 +161,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 		specColor = mtlSpecColor*lightColor*qPow(spec, 2);
 	}
 
-	//´¦ÀíÒõÓ°£¬Ö»¿¼ÂÇ¾Ö²¿¹âÕÕ£¬¹âÕÕÉä²»µ½µÄµØ·½Ã»ÓÐDiffuseºÍSpecular
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½Ö»ï¿½ï¿½ï¿½Ç¾Ö²ï¿½ï¿½ï¿½ï¿½Õ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä²»ï¿½ï¿½ï¿½ÄµØ·ï¿½Ã»ï¿½ï¿½Diffuseï¿½ï¿½Specular
 	RTRRenderElement* directLight = NULL;
 	renderer->elementsCache->search(directLight, RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS), intersectElement);
 	if (directLight != NULL)
@@ -172,7 +172,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount, const
 
 	diffuseColor = diffuseColor + intersectColor * mtlAmbientColor;
 
-	//µü´ú´ÎÊýÏÞÖÆµ½´ïÊ±£¬ºöÂÔÕÛÉäºÍ·´Éä¹âÏß
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	if (iterationCount >= 5) return diffuseColor + specColor;
 
 	if (reflectionRate > 0.00001)

@@ -6,6 +6,7 @@
 #include "RTRGeometry.h"
 #include "Light/RTRLightPoint.h"
 #include "RTRRenderThread.h"
+#include "RTRRadianceRenderer.h"
 
 RTRRenderer::RTRRenderer(QImage *_image)
 {
@@ -80,12 +81,70 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
 			renderGridPass[i][j] = 0;
 		}
 	}
-	allocateTask();
+    auto radianceRenderer = new RTRRadianceRenderer();
+
+    radianceRenderer->model = model;
+    radianceRenderer->elements = elements;
+    radianceRenderer->elementsCache = elementsCache;
+    radianceRenderer->sampler = &this->sampler;
+
+    QVector<Photon> photons;
+
+    for(int i = 0; i < 100000; i++)
+    {
+    RTRVector3D lightSource = RTRVector3D(-2 + (qrand() / (double)RAND_MAX * 2 - 1)
+                                          , 0 + (qrand() / (double)RAND_MAX * 2 - 1)
+                                          , 4.99);
+    RTRVector3D lightDirection;
+    do {
+        lightDirection = sampler.generateRandomDirection();
+    } while(lightDirection.z() > 0);
+    lightDirection.vectorNormalize();
+    radianceRenderer->renderPhoton(lightSource, lightDirection, photons, false);
+    }
+    /*for(int i = 0; i < 300000; i++)
+    {
+    RTRVector3D lightSource = RTRVector3D(-2 + (qrand() / (double)RAND_MAX * 2 - 1)
+                                          , 0 + (qrand() / (double)RAND_MAX * 2 - 1)
+                                          , 4.99);
+    RTRVector3D lightDirection;
+    do {
+        lightDirection = sampler.generateRandomDirection();
+    } while(lightDirection.z() > 0);
+    lightDirection.vectorNormalize();
+    radianceRenderer->renderPhoton(lightSource, lightDirection, photons, true);
+    }*/
+    qDebug() << photons.size();
+    for(int i = 0; i < image->width(); i++)
+    {
+        for(int j = 0; j < image->height(); j++)
+        {
+            image->setPixel(i, j, RTRColor(0,0,0).toQtColor().rgb());
+        }
+    }
+    int orr = 0;
+    for(int i = 0; i < photons.size(); i++)
+    {
+        auto point = camera->transformPoint(photons[i].location);
+        //qDebug() << point.x() << point.y();
+        //qDebug() << photons[i].color.r() << photons[i].color.g() << photons[i].color.b();
+        if(point.x() < 0 || point.y() < 0 || point.x() > image->width() - 1 || point.y() > image->height() - 1)
+        {
+            orr++;
+            continue;
+        }
+        renderPixel(point.x(), point.y(), 1.0, photons[i].color);
+    }
+    qDebug() << "orr" << orr;
+    emit renderStatusChanged();
+    //allocateTask();
 	return true;
 }
 
 void RTRRenderer::renderPixel(int x, int y, double z, const RTRColor& color)
 {
+    //qDebug() << color.r();
+    //qDebug() <<color.toQtColor();
 	image->setPixel(x,image->height()-1-y,color.toQtColor().rgb());
 }
 

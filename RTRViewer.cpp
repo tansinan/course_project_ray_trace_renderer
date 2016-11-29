@@ -37,7 +37,7 @@ void RTRViewer::mousePressEvent(QMouseEvent * event)
 
 void RTRViewer::updateDisplay(bool forced)
 {
-	static int lastUpdate = 0;
+    /*static int lastUpdate = 0;
 	if(clock() - lastUpdate < CLOCKS_PER_SEC/8 && !forced)
 	{
 		return;
@@ -54,8 +54,8 @@ void RTRViewer::updateDisplay(bool forced)
 			}
 			else renderer->renderPixel(i, j, 0, RTRColor());
 		}
-	}
-	for(int k=0;k<8;k++)
+    }
+    for(int k=0;k<8;k++)
 	{
 		if(forced) break;
 		if(renderer->renderThreads[k]->isFinished()) continue;
@@ -77,6 +77,6 @@ void RTRViewer::updateDisplay(bool forced)
 				}
 			}
 		}
-	}
+    }*/
 	repaint();
 }

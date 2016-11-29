@@ -7,6 +7,7 @@
 #include "RTRMaterial.h"
 #include "RTRRenderElement.h"
 #include "RTRKdTree.h"
+#include "SamplingUtil.h"
 
 class RTRRenderThread;
 
@@ -15,6 +16,7 @@ class RTRRenderer :public QObject
 	friend class RTRViewer;
 	Q_OBJECT
 public:
+  SamplingUtil sampler;
 	double searchTime = 0.0;
 	double processTime = 0.0;
 	RTRModel* model;
