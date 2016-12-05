@@ -1,0 +1,4 @@
+class Photon
+{
+  float posiiton;
+};
