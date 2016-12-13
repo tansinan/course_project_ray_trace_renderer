@@ -133,6 +133,7 @@ public:
 	static RTRMatrix33 inverseRotationMatrix(double angleX, double angleY, double angleZ);
 
 	//将点反向投影回空间中的一条直线（由于R3->R2的变换本身是不可逆的，因此没有附加信息结果不可能是一个点）
+
 	static RTRSegment invertProject(const RTRVector2D& point, const RTRCamera& camera);
 
 

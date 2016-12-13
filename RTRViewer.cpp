@@ -37,7 +37,7 @@ void RTRViewer::mousePressEvent(QMouseEvent * event)
 
 void RTRViewer::updateDisplay(bool forced)
 {
-    /*static int lastUpdate = 0;
+  static int lastUpdate = 0;
 	if(clock() - lastUpdate < CLOCKS_PER_SEC/8 && !forced)
 	{
 		return;
@@ -77,6 +77,6 @@ void RTRViewer::updateDisplay(bool forced)
 				}
 			}
 		}
-    }*/
+    }
 	repaint();
 }

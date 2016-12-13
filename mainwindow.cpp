@@ -129,12 +129,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::saveImage()
 {
-	if(renderer.image->save(editSaveFile->text()))
-	{
-		QMessageBox::information(this, "Message","File save succeeded!");
-	}
-	else
-	{
-		QMessageBox::warning(this, "Warning","File save failed!");
-	}
+    if(renderer.image->save(editSaveFile->text()))
+    {
+        QMessageBox::information(this, "Message","File save succeeded!");
+    }
+    else
+    {
+        QMessageBox::warning(this, "Warning","File save failed!");
+    }
 }

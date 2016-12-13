@@ -3,6 +3,14 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <cmath>
+#include <set>
+
+template<class T>
+static T myPow2(T val)
+{
+    return val * val;
+}
 
 class Point;
 
@@ -24,12 +32,18 @@ public:
         TCoord boundingBoxMin[Dim];
         TCoord boundingBoxMax[Dim];
     };
+protected:
+    Node* root;
+public:
     static void construct(Node* node, std::vector<TElem> points, int divition,
         int allSameCount, TCoord boundingBoxMin[Dim], TCoord boundingBoxMax[Dim], Node* parent);
     static void construct(Node* node, std::vector<TElem> points);
-    static Node* construct(std::vector<TElem> points);
-    static std::vector<TElem> lookupNearest(Node* root, TElem value, int count);
+    static NearestSearchKdTree* construct(std::vector<TElem> points);
+    void insertTree(std::vector<TElem>& points, Node* node, TElem value, int count);
+    void lookupNearest(std::vector<TElem> &resultCache, Node* root, TElem value, int count);
+    std::vector<TElem> lookupNearest(TElem value, int count);
 protected:
+    //std::vector<TElem> resultCache;
     NearestSearchKdTree();
 public:
     ~NearestSearchKdTree();
@@ -49,11 +63,12 @@ void NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::construct(Node* node, s
         node->boundingBoxMax[i] = boundingBoxMax[i];
     }
     //If there are less than 5 points, stop divition.
-    if (points.size() < 5)
+    if (points.size() < 128)
     {
         node->splitDirection = -1;
         node->smallChild = node->largeChild = nullptr;
         node->points = points;
+        return;
     }
     node->splitDirection = divition;
     std::sort(points.begin(), points.end(), [divition](TElem p1, TElem p2) {
@@ -154,31 +169,76 @@ void NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::construct(Node* node, s
 }
 
 template<class TElem, class TCoord, int Dim, class TAccCoord>
-typename NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::Node* NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::construct(std::vector<TElem> points)
+NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord> *NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::construct(std::vector<TElem> points)
 {
-    Node* node = new Node();
-    construct(node, points);
-    return node;
+    Node* root = new Node();
+    construct(root, points);
+    NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord> *kdTree =
+        new NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>();
+    kdTree->root = root;
+    return kdTree;
 }
 
 template<class TElem, class TCoord, int Dim, class TAccCoord>
-static void insertTree(std::vector<TElem>& points, typename NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::Node* node)
+void NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::insertTree(std::vector<TElem>& points, typename NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::Node* node, TElem value, int count)
 {
     if (node->splitDirection == -1)
     {
         points.insert(points.end(), node->points.begin(), node->points.end());
+        if(node->points.size() > 0)
+        {
+            std::sort(points.begin(), points.end(), [value](TElem p1, TElem p2) {
+                TCoord length1 = 0.0, length2 = 0.0;
+                for (int i = 0; i < Dim; i++)
+                {
+                    length1 += myPow2(accCoord(p1, i) - accCoord(value, i));
+                    length2 += myPow2(accCoord(p2, i) - accCoord(value, i));
+                }
+                return length1 < length2;
+            });
+        }
+        if(points.size() > count)
+        {
+            points.resize(count);
+        }
     }
     else
     {
-        insertTree<TElem, TCoord, Dim, TAccCoord>(points, node->largeChild);
-        insertTree<TElem, TCoord, Dim, TAccCoord>(points, node->smallChild);
+        insertTree(points, node->largeChild, value, count);
+        insertTree(points, node->smallChild, value, count);
     }
 }
 
 template<class TElem, class TCoord, int Dim, class TAccCoord>
-std::vector<TElem> NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::lookupNearest(Node * root, TElem value, int count)
+void NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::lookupNearest(std::vector<TElem>& resultCache, Node * root, TElem value, int count)
 {
-    std::vector<TElem> result;
+    if(resultCache.size() >= count)
+    {
+      bool  finish = true;
+      TElem furthest = resultCache[count - 1];
+      TCoord length = 0.0;
+      for (int i = 0; i < Dim; i++)
+      {
+          length += pow(accCoord(furthest, i) - accCoord(value, i), 2);
+      }
+      for (int i = 0; i < Dim; i++)
+      {
+          if (myPow2(root->boundingBoxMax[i] - accCoord(value, i)) <= length)
+          {
+              finish = false;
+              break;
+          }
+          if (myPow2(root->boundingBoxMin[i] - accCoord(value, i)) <= length)
+          {
+              finish = false;
+              break;
+          }
+      }
+      if(finish)
+      {
+          return;
+      }
+    }
     Node* leaf = root;
     while (leaf->splitDirection != -1)
     {
@@ -191,47 +251,39 @@ std::vector<TElem> NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::lookupNea
             leaf = leaf->smallChild;
         }
     }
-    insertTree<TElem, TCoord, Dim, TAccCoord>(result, leaf);
+    insertTree(resultCache, leaf, value, count);
     for (;;)
     {
         bool finish = true;
-        std::sort(result.begin(), result.end(), [value](TElem p1, TElem p2) {
-            TCoord length1 = 0.0, length2 = 0.0;
-            for (int i = 0; i < Dim; i++)
-            {
-                length1 += pow(accCoord(p1, i) - accCoord(value, i), 2);
-                length2 += pow(accCoord(p2, i) - accCoord(value, i), 2);
-            }
-            return length1 < length2;
-        });
-        if (result.size() < count)
+        if (resultCache.size() < count)
         {
             finish = false;
         }
         else
         {
-            result.resize(count);
-            TElem furthest = result[count - 1];
+            //resultCache.resize(count);
+            TElem furthest = resultCache[count - 1];
             TCoord length = 0.0;
             for (int i = 0; i < Dim; i++)
             {
                 length += pow(accCoord(furthest, i) - accCoord(value, i), 2);
             }
+            //std::cout << length << std::endl;
             for (int i = 0; i < Dim; i++)
             {
-                if (pow(leaf->boundingBoxMax[i] - accCoord(value, i), 2) <= length)
+                if (myPow2(leaf->boundingBoxMax[i] - accCoord(value, i)) <= length)
                 {
                     finish = false;
                     break;
                 }
-                else if (pow(leaf->boundingBoxMin[i] - accCoord(value, i), 2) <= length)
+                if (myPow2(leaf->boundingBoxMin[i] - accCoord(value, i)) <= length)
                 {
                     finish = false;
                     break;
                 }
             }
         }
-        if (finish || leaf == root) //TODO?
+        if (finish || leaf == root)
         {
             break;
         }
@@ -239,17 +291,21 @@ std::vector<TElem> NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::lookupNea
         leaf = leaf->parent;
         if (leaf->smallChild == oldLeaf)
         {
-            std::vector<TElem> branchResult = lookupNearest(leaf->largeChild, value, count);
-            result.insert(result.end(), branchResult.begin(), branchResult.end());
-            //insertTree(result, leaf->largeChild);
+            lookupNearest(resultCache, leaf->largeChild, value, count);
         }
         else
         {
-            std::vector<TElem> branchResult = lookupNearest(leaf->smallChild, value, count);
-            result.insert(result.end(), branchResult.begin(), branchResult.end());
+            lookupNearest(resultCache, leaf->smallChild, value, count);
         }
     }
-    return result;
+}
+
+template<class TElem, class TCoord, int Dim, class TAccCoord>
+std::vector<TElem> NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::lookupNearest(TElem value, int count)
+{
+    std::vector<TElem> ret;
+    lookupNearest(ret, root, value, count);
+    return ret;
 }
 
 template<class TElem, class TCoord, int Dim, class TAccCoord>
@@ -261,5 +317,3 @@ template<class TElem, class TCoord, int Dim, class TAccCoord>
 NearestSearchKdTree<TElem, TCoord, Dim, TAccCoord>::~NearestSearchKdTree()
 {
 }
-
-

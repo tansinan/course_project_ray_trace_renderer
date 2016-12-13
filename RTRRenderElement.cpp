@@ -68,6 +68,9 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		vert3.y() = triangle3D->vertices[2].z();
 	}
 	orthProjectTriangle = new RTRTriangle2D(vert1, vert2, vert3);
+    auto AB = triangle3D->vertices[1] - triangle3D->vertices[0];
+    auto AC = triangle3D->vertices[2] - triangle3D->vertices[0];
+    areaDouble = (AB(0) * AC(1) - AB(1) * AC(0));
 }
 
 bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVector3D& normal, RTRColor& color) const
@@ -129,6 +132,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 	}
 
 	//处理Phong法线平滑着色
+
 	if (useSmoothShading)
 	{
 		normal = vertexNormals[0] * a1 + vertexNormals[1] * a2 + vertexNormals[2] * a3;
@@ -140,6 +144,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 
 
 	//处理漫反射颜色贴图
+
 	if (material != NULL)
 	{
 		if (material->getPropertyType("diffuse")==RTRMaterial::TYPE_COLOR) color = material->getColorAt("diffuse", 0, 0);
@@ -158,27 +163,21 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 
 bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result)
 {
-	result = RTRGeometry::intersect(triangle3D->plane, ray);
-	RTRVector2D temp;
-	bool ret = true;
-	if (orthProjectDirection == 0)
-	{
-		temp.x() = result.y();
-		temp.y() = result.z();
-		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
-	}
-	else if (orthProjectDirection == 1)
-	{
-		temp.x() = result.x();
-		temp.y() = result.z();
-		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
-	}
-	if (orthProjectDirection == 2)
-	{
-		temp.x() = result.x();
-		temp.y() = result.y();
-		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
-	}
-	if (!ret) return false;
-	else return true;
+    double ratio = 0.0;
+    double d1 = RTRGeometry::distance(ray.beginningPoint, triangle3D->plane);
+    double d2 = RTRGeometry::distance(ray.endPoint, triangle3D->plane);
+    if (d1 > 0 && d2 > 0) return false;
+    if (d1 < 0 && d2 < 0) return false;
+    ratio = d1 / (d1 - d2);
+    result = ray.beginningPoint + (ray.endPoint - ray.beginningPoint) * ratio;
+	//result = RTRGeometry::intersect(triangle3D->plane, ray);
+    auto PB = triangle3D->vertices[1] - result;
+    auto PC = triangle3D->vertices[2] - result;
+    auto alpha = (PB(0) * PC(1) - PB(1) * PC(0)) / areaDouble;
+    if (alpha < 0 || alpha > 1) return false;
+    auto PA = triangle3D->vertices[0] - result;
+    auto beta = (PC(0) * PA(1) - PC(1) * PA(0)) / areaDouble;
+    if (beta < 0 || beta > 1) return false;
+    if (alpha + beta > 1) return false;
+    return true;
 }

@@ -10,31 +10,33 @@
 #include "SamplingUtil.h"
 
 class RTRRenderThread;
+class RTRRadianceRenderer;
 
 class RTRRenderer :public QObject
 {
-	friend class RTRViewer;
-	Q_OBJECT
+    friend class RTRViewer;
+    Q_OBJECT
 public:
-  SamplingUtil sampler;
-	double searchTime = 0.0;
-	double processTime = 0.0;
-	RTRModel* model;
-	QVector<RTRRenderElement*> elements;
-	RTRKdTree* elementsCache;
-	RTRCamera* camera;
-	QImage* image;
+    SamplingUtil sampler;
+    double searchTime = 0.0;
+    double processTime = 0.0;
+    RTRModel* model;
+    QVector<RTRRenderElement*> elements;
+    RTRKdTree* elementsCache;
+    RTRCamera* camera;
+    QImage* image;
 public:
-	RTRColor* renderResult;
-	RTRRenderThread** renderThreads;
-	int renderGridPass[16][12];
-	int currentPass;
-	int targetPass;
+    RTRColor* renderResult;
+    RTRRenderThread** renderThreads;
+    int renderGridPass[16][12];
+    int currentPass;
+    int targetPass;
 protected:
-	void allocateTask(int threadId = -1);
+    RTRRadianceRenderer *radianceRenderer;
+    void allocateTask(int threadId = -1);
 public slots:
-	void onRenderFinished(int threadId);
-	void onThreadFinished();
+    void onRenderFinished(int threadId);
+    void onThreadFinished();
 signals:
 	void renderStatusChanged();
 	void renderFinished();

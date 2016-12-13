@@ -1,4 +1,0 @@
-class Photon
-{
-  float posiiton;
-};

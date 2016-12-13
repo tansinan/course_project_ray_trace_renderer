@@ -167,38 +167,58 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
 				mtlFile.close();
 				return false;
 			}
-			if (command == "kd")
-				currentMaterial->setColorProperty("diffuse", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "map_kd")
-				currentMaterial->setTextureProperty("diffuse", modelPath + "/" + param[0]);
-			else if (command == "ka")
-				currentMaterial->setColorProperty("ambient", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "ks")
-				currentMaterial->setColorProperty("specular", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "reflection_rate")
-				currentMaterial->setColorProperty("reflection_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "reflection_color")
-				currentMaterial->setColorProperty("reflection_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "reflection_glossiness")
-				currentMaterial->setColorProperty("reflection_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "refraction_rate")
-				currentMaterial->setColorProperty("refraction_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "refraction_index")
-				currentMaterial->setColorProperty("refraction_index", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "refraction_color")
-				currentMaterial->setColorProperty("refraction_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "refraction_glossiness")
-				currentMaterial->setColorProperty("refraction_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "fod_aperture")
-				currentMaterial->setColorProperty("fod_aperture", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "fod_focus")
-				currentMaterial->setColorProperty("fod_focus", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
-			else if (command == "camera_position")
-				currentMaterial->setColorProperty("camera_position", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "camera_angle")
-				currentMaterial->setColorProperty("camera_angle", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
-			else if (command == "image_distance")
-				currentMaterial->setColorProperty("image_distance", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            if (command == "kd")
+            {
+                currentMaterial->diffuse = RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble());
+                currentMaterial->setColorProperty("diffuse", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            }
+            else if (command == "map_kd")
+                currentMaterial->setTextureProperty("diffuse", modelPath + "/" + param[0]);
+            else if (command == "ka")
+                currentMaterial->setColorProperty("ambient", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            else if (command == "ks")
+                currentMaterial->setColorProperty("specular", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            else if (command == "reflection_rate")
+            {
+                currentMaterial->reflectionRate = param[0].toDouble();
+                currentMaterial->setColorProperty("reflection_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            }
+            else if (command == "reflection_color")
+            {
+                currentMaterial->reflectionColor = RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble());
+                currentMaterial->setColorProperty("reflection_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            }
+            else if (command == "reflection_glossiness")
+                currentMaterial->setColorProperty("reflection_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            else if (command == "refraction_rate")
+            {
+                currentMaterial->refractionRate = param[0].toDouble();
+                currentMaterial->setColorProperty("refraction_rate", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            }
+            else if (command == "refraction_index")
+            {
+                currentMaterial->refractionIndex = param[0].toDouble();
+                currentMaterial->setColorProperty("refraction_index", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            }
+            else if (command == "refraction_color")
+            {
+                currentMaterial->refractionColor = RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble());
+                currentMaterial->setColorProperty("refraction_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            }
+            else if (command == "refraction_glossiness")
+                currentMaterial->setColorProperty("refraction_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            else if (command == "fod_aperture")
+                currentMaterial->setColorProperty("fod_aperture", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            else if (command == "fod_focus")
+                currentMaterial->setColorProperty("fod_focus", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            else if (command == "camera_position")
+                currentMaterial->setColorProperty("camera_position", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            else if (command == "camera_angle")
+                currentMaterial->setColorProperty("camera_angle", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
+            else if (command == "image_distance")
+                currentMaterial->setColorProperty("image_distance", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            else if (command == "emission_strength")
+                currentMaterial->emissionStrength = param[0].toDouble();
 		}
 	}
 	if (currentMaterial != NULL)

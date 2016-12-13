@@ -4,6 +4,8 @@
 #include <random>
 #include "RTRVector3D.h"
 
+class RTRTriangle3D;
+
 class SamplingUtil
 {
 public:
@@ -18,7 +20,9 @@ public:
     void init();
     double generateRandomNumber();
     double generateRandomNumber(double a, double b);
+    int generateInteger(int a, int b);
     RTRVector3D generateRandomDirection();
+    RTRVector3D generateRandomPointInTriangle(const RTRTriangle3D& triangle);
 };
 
 #endif // SAMPLINGUTIL_H

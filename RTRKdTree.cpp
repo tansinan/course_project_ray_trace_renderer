@@ -86,6 +86,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 			if (elementTable[i]->getBoundingBox().contain(parent->boundingBox))
 			{
 			//parent->data.append(elementTable[i]);
+
 			continue;
 			}
 			if (valSmall < mid)
@@ -111,7 +112,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 		}
 	}
 
-	if (minDuplicate / (double)elementTable.size() > 0.5)
+	if (minDuplicate / (double)elementTable.size() > 0.3)
 	{
 		depth = maxDepth + 1;
 	}
@@ -145,7 +146,7 @@ void RTRKdTree::cleanUp(Node* node)
 
 RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 {
-	int maxDepth = log2(elementTable.size()) + 3;
+	int maxDepth = log2(elementTable.size());
 	RTRKdTree* ret = new RTRKdTree();
 	if (elementTable.size() == 0) return NULL;
 	RTRBoundingBox boundingBox;
@@ -195,48 +196,52 @@ void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const
 void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
 	RTRRay& ray, double& minZ, const RTRRenderElement* elementFrom) const
 {
-	int splitMethod = node->splitMethod;
-	if (!RTRGeometry::intersect(node->boundingBox, segment)) return;
-	for (int i = 0; i < node->data.size(); i++)
-	{
-		if (node->data[i] == elementFrom) continue;
-		RTRVector3D temp;
-		if (node->data[i]->intersect(ray, temp))
-		{
-			if (sgn(ray.beginningPoint.y() - temp.y()) != sgn(ray.beginningPoint.y() - ray.endPoint.y())) continue;
-			double zVal = qAbs(ray.beginningPoint.y() - temp.y());
-			if (zVal<minZ)
-			{
-				minZ = zVal;
-				searchResult = node->data[i];
-				ray.endPoint = temp;
-			}
-		}
-		//searchResult.insert(node->data[i]);
-	}
-	if (node->large == NULL) return;
-	if (segment.beginningPoint(splitMethod) > segment.endPoint(splitMethod))
-	{
-		std::swap(segment.beginningPoint, segment.endPoint);
-	}
-	double a1 = ray.beginningPoint(splitMethod);
-	double a2 = ray.endPoint(splitMethod);
-	double b1 = segment.beginningPoint(splitMethod);
-	double b2 = segment.endPoint(splitMethod);
-	if (a1 > a2) std::swap(a1, a2);
-	if (b1 > b2) std::swap(b1, b2);
-	if (a1 > b2 || b1 > a2) return;
-	//segment.beginningPoint(splitMethod)
-	if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod) - (1e-5))
-	{
-		search(node->small, searchResult, segment, ray, minZ, elementFrom);
-		return;
-	}
-	if (segment.beginningPoint(splitMethod) > node->small->boundingBox.point2(splitMethod) + (1e-5))
-	{
-		search(node->large, searchResult, segment, ray, minZ, elementFrom);
-		return;
-	}
+    if (!RTRGeometry::intersect(node->boundingBox, segment)) return;
+
+    for (;;)
+    {
+        int splitMethod = node->splitMethod;
+        for (int i = 0; i < node->data.size(); i++)
+        {
+            if (node->data[i] == elementFrom) continue;
+            RTRVector3D temp;
+            if (node->data[i]->intersect(ray, temp))
+            {
+                double zVal = (temp - ray.beginningPoint).dotProduct(ray.direction);
+                if (zVal < 0) continue;
+                if (zVal < minZ)
+                {
+                    minZ = zVal;
+                    searchResult = node->data[i];
+                    ray.endPoint = temp;
+                }
+            }
+            //searchResult.insert(node->data[i]);
+        }
+        if (node->large == NULL) return;
+        if (segment.beginningPoint(splitMethod) > segment.endPoint(splitMethod))
+        {
+            std::swap(segment.beginningPoint, segment.endPoint);
+        }
+        double a1 = ray.beginningPoint(splitMethod);
+        double a2 = ray.endPoint(splitMethod);
+        double b1 = segment.beginningPoint(splitMethod);
+        double b2 = segment.endPoint(splitMethod);
+        if (a1 > a2) std::swap(a1, a2);
+        if (b1 > b2) std::swap(b1, b2);
+        if (a1 > b2 || b1 > a2) return;
+        //segment.beginningPoint(splitMethod)
+        if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod) - (1e-5))
+        {
+            node = node->small;
+        }
+        else if (segment.beginningPoint(splitMethod) > node->small->boundingBox.point2(splitMethod) + (1e-5))
+        {
+            node = node->large;
+        }
+        else break;
+    }
+    int splitMethod = node->splitMethod;
 	RTRSegment segmentSmallTemp, segmentLargeTemp;
 	segmentSmallTemp.beginningPoint = segment.beginningPoint;
 	segmentLargeTemp.endPoint = segment.endPoint;
