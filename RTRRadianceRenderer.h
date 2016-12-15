@@ -88,7 +88,7 @@ public:
 public:
     void renderPhoton(
         RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
-        RTRRenderElement *emissionElement, bool causticOnly);
+        RTRRenderElement *emissionElement, RTRColor lightColor, bool causticOnly);
     void execute();
 };
 

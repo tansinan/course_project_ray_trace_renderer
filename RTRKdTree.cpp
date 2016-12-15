@@ -112,7 +112,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 		}
 	}
 
-	if (minDuplicate / (double)elementTable.size() > 0.3)
+	if (minDuplicate / (double)elementTable.size() > 0.5)
 	{
 		depth = maxDepth + 1;
 	}
@@ -223,13 +223,22 @@ void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& 
         {
             std::swap(segment.beginningPoint, segment.endPoint);
         }
+        auto rayBeginPoint = ray.beginningPoint;
+        auto rayEndPoint = ray.endPoint;
         double a1 = ray.beginningPoint(splitMethod);
         double a2 = ray.endPoint(splitMethod);
         double b1 = segment.beginningPoint(splitMethod);
         double b2 = segment.endPoint(splitMethod);
+        if (a1 > a2)
+        {
+            std::swap(rayBeginPoint, rayEndPoint);
+        }
         if (a1 > a2) std::swap(a1, a2);
-        if (b1 > b2) std::swap(b1, b2);
         if (a1 > b2 || b1 > a2) return;
+        /*if (b2 < a2)
+        {
+            segment.endPoint = rayEndPoint;
+        }*/
         //segment.beginningPoint(splitMethod)
         if (segment.endPoint(splitMethod) < node->large->boundingBox.point1(splitMethod) - (1e-5))
         {

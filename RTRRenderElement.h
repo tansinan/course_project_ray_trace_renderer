@@ -10,8 +10,10 @@ class RTRRenderElement
 protected:
 	int orthProjectDirection;
 	RTRTriangle2D* orthProjectTriangle;
-    //RTRMatrix<3, 1> AB;
-    //RTRMatrix<3, 1> AC;
+    RTRVector3D AB;
+    RTRVector3D AC;
+    RTRVector3D areaVector;
+    int bestAreaVectorDim;
     double areaDouble;
 public:
 	bool useSmoothShading;

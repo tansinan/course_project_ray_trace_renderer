@@ -68,8 +68,17 @@ RTRRenderElement::RTRRenderElement(RTRTriangle3D* _triangle3D, RTRCamera* camera
 		vert3.y() = triangle3D->vertices[2].z();
 	}
 	orthProjectTriangle = new RTRTriangle2D(vert1, vert2, vert3);
-    auto AB = triangle3D->vertices[1] - triangle3D->vertices[0];
-    auto AC = triangle3D->vertices[2] - triangle3D->vertices[0];
+    AB = triangle3D->vertices[1] - triangle3D->vertices[0];
+    AC = triangle3D->vertices[2] - triangle3D->vertices[0];
+    areaVector = AB.crossProduct(AC);
+    bestAreaVectorDim = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        if (abs(areaVector(i)) > abs(areaVector(bestAreaVectorDim)))
+        {
+            bestAreaVectorDim = i;
+        }
+    }
     areaDouble = (AB(0) * AC(1) - AB(1) * AC(0));
 }
 
@@ -96,7 +105,7 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result, RTRVect
 		temp.y() = result.y();
 		ret = RTRGeometry::pointInsideTriangle(*orthProjectTriangle, temp);
 	}
-	if (!ret) return false;
+	//if (!ret) return false;
 
 	double a1, a2, a3;
 	RTRVector3D line12 = triangle3D->vertices[1] - triangle3D->vertices[0];
@@ -171,12 +180,12 @@ bool RTRRenderElement::intersect(const RTRRay& ray, RTRVector3D& result)
     ratio = d1 / (d1 - d2);
     result = ray.beginningPoint + (ray.endPoint - ray.beginningPoint) * ratio;
 	//result = RTRGeometry::intersect(triangle3D->plane, ray);
-    auto PB = triangle3D->vertices[1] - result;
-    auto PC = triangle3D->vertices[2] - result;
-    auto alpha = (PB(0) * PC(1) - PB(1) * PC(0)) / areaDouble;
+    RTRVector3D PB = triangle3D->vertices[1] - result;
+    RTRVector3D PC = triangle3D->vertices[2] - result;
+    auto alpha = PB.crossProduct(PC)(bestAreaVectorDim) / areaVector(bestAreaVectorDim);
     if (alpha < 0 || alpha > 1) return false;
     auto PA = triangle3D->vertices[0] - result;
-    auto beta = (PC(0) * PA(1) - PC(1) * PA(0)) / areaDouble;
+    auto beta = PC.crossProduct(PA)(bestAreaVectorDim) / areaVector(bestAreaVectorDim);
     if (beta < 0 || beta > 1) return false;
     if (alpha + beta > 1) return false;
     return true;

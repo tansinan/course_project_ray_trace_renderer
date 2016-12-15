@@ -44,14 +44,37 @@ public:
 	const double& operator() (int i, int j) const  { return elementAt(i, j); }
 	double& operator() (int n) { return elementAt(n); }
 	const double& operator() (int n) const { return elementAt(n); }
-	void fill(double value = 0)
+	inline void fill(double value = 0)
 	{
 		for (int i = 0; i < R*C; i++)
 		{
 			data[i] = value;
 		}
 	}
-	const RTRMatrix& operator= (const RTRMatrix& other)
+
+    inline double sum()
+    {
+        double ret = 0.0;
+        for (int i = 0; i < R*C; i++)
+        {
+            ret += data[i];
+        }
+        return ret;
+    }
+
+    inline double maxElementAbs()
+    {
+        double ret = 0.0;
+        for (int i = 0; i < R*C; i++)
+        {
+            auto absVal = abs(data[i]);
+            if (absVal > ret)
+                ret = absVal;
+        }
+        return ret;
+    }
+
+	inline const RTRMatrix& operator= (const RTRMatrix& other)
 	{
 		for (int i = 0; i < R*C; i++)
 		{
@@ -60,7 +83,7 @@ public:
 		return *this;
 	}
 
-	bool operator== (const RTRMatrix<R,C>& other) const
+	inline bool operator== (const RTRMatrix<R,C>& other) const
 	{
 		for (int i = 0; i < R*C; i++)
 		{

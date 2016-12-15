@@ -92,6 +92,7 @@ public:
 	RTRPlane plane;
 public:
 	RTRTriangle3D(const RTRVector3D &vert1, const RTRVector3D &vert2, const RTRVector3D &vert3);
+    double area();
 };
 
 class RTRTriangle2D
@@ -146,7 +147,7 @@ public:
 	*/
 	static RTRVector3D invertProjectTo(const RTRVector2D& point, const RTRCamera& camera, bool& isInside);
 
-	static double distance(RTRVector3D point, RTRPlane plane);
+	static double distance(const RTRVector3D &point, const RTRPlane &plane);
 };
 
 

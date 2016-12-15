@@ -114,6 +114,12 @@ RTRTriangle3D::RTRTriangle3D(const RTRVector3D& vert1, const RTRVector3D& vert2,
     vertices[2] = vert3;
 }
 
+double RTRTriangle3D::area()
+{
+    return
+        RTRVector3D(vertices[1] - vertices[0]).crossProduct(RTRVector3D(vertices[2] - vertices[0])).vectorLength() / 2.0;
+}
+
 RTRTriangle2D::RTRTriangle2D(const RTRVector2D& vert1, const RTRVector2D& vert2, const RTRVector2D& vert3)
 //:edges(vert1,vert2,RTRSegment2D::CREATE_FROM_POINTS)
 /*:edges{{vert1,vert2,RTRSegment2D::CREATE_FROM_POINTS},
@@ -208,7 +214,7 @@ RTRSegment RTRGeometry::invertProject(const RTRVector2D &point, const RTRCamera 
     return camera.inverseProject(point);
 }
 
-double RTRGeometry::distance(RTRVector3D point, RTRPlane plane)
+double RTRGeometry::distance(const RTRVector3D &point, const RTRPlane &plane)
 {
     return (point - plane.onePoint).dotProduct(plane.normal);
 }
