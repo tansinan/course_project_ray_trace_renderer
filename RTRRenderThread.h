@@ -41,7 +41,7 @@ protected:
     */
     RTRColor renderRay(const RTRRay& ray, int iterationCount = 0,
         const RTRRenderElement* elementFrom = NULL,
-        double refracInAir = true, int diffuseCount = 0, bool directOnly = false);
+        double refracInAir = true, int diffuseCount = 0, int specularCount = 0, bool directOnly = false);
 
 signals:
     void renderFinished(int _threadIndex);

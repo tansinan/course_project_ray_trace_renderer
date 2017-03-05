@@ -22,6 +22,7 @@ public:
 	double a() const;
 	QColor toQtColor() const;
 	RTRColor operator*(const RTRColor& other);
+    RTRColor operator+(const RTRColor& other);
 	RTRColor operator*(double ratio);
 };
 

@@ -107,7 +107,7 @@ void RTRRenderThread::run()
 }
 
 RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
-    const RTRRenderElement* elementFrom, double refracInAir, int diffuseCount,
+    const RTRRenderElement* elementFrom, double refracInAir, int diffuseCount, int specularCount,
     bool directOnly)
 {
     qsrand(qrand() ^ (clock() + time(0)));
@@ -274,23 +274,37 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         radianceRenderer->stlDiffusePhotons,
         intersectPoint, intersectNormal, intersectColor) / 200;*/// + specColor;
 
+    //处理发光材质，原则上来说如果有发光材质应当直接返回光源亮度．
+    //但是，如果历史记录表明这条光线只经过一次diffuse，问题就不一样了．那说明这个渲染结果应当由caustic photon map来处理．
+    //TODO: 添加caustic photon map的开关．
     if (mtlEmissionStrength > 0.0001)
     {
+        if(diffuseCount == 1 && specularCount != 0)
+        {
+            return RTRColor(0.0, 0.0, 0.0);
+        }
+        else
         return RTRColor(mtlEmissionStrength, mtlEmissionStrength, mtlEmissionStrength);
     }
     if (iterationCount >= 8) return diffuseColor;
+
+    //TODO: refrac/refl/diffuse on material should also be determined by probability.
+
+    //TODO: in case of
     if (reflectionRate > 0.00001)
     {
         RTRVector3D reflectionDirection(0.0, 0.0, 0.0);
         reflectionDirection = (intersectNormal * 2 * ray.direction.dotProduct(intersectNormal) - ray.direction)*-1;
-        if (mtlReflGloss < 0.99999)
+        //TODO: 重新考虑节点类型
+        /*if (mtlReflGloss < 0.99999)
         {
             reflectionDirection.x() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
             reflectionDirection.y() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
             reflectionDirection.z() *= (1 + (qrand() / (double)RAND_MAX * 2 - 1)*(1 - mtlReflGloss));
-        }
+        }*/
         RTRRay reflectionRay(intersectPoint, reflectionDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-        RTRColor reflectionColor = renderRay(reflectionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount)*mtlReflColor;
+        RTRColor reflectionColor = renderRay(reflectionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount, specularCount + 1)*mtlReflColor;
+        //TODO: 用MC方法处理漫反射？
         return reflectionColor * reflectionRate + diffuseColor * (1 - reflectionRate);// + specColor;
     }
     else if (mtlRefracRate > 0.00001)
@@ -308,15 +322,15 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         double c = -ray.direction.dotProduct(refractionNormal);
         double r = 1 / IOR;
         double temp = 1 - r*r*(1 - c*c);
+        //处理全反射
         if (temp < 0)
         {
-            qDebug() << temp << r;
             return diffuseColor * (1 - mtlRefracRate);// + specColor;
         }
         RTRVector3D refractionDirection = ray.direction * r + refractionNormal*(r*c - qSqrt(temp));
         refractionDirection.vectorNormalize();
         RTRRay refractionRay(intersectPoint, refractionDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-        RTRColor refractionColor = renderRay(refractionRay, iterationCount + 1, intersectElement, !refracInAir, diffuseCount)*mtlRefracColor;
+        RTRColor refractionColor = renderRay(refractionRay, iterationCount + 1, intersectElement, !refracInAir, diffuseCount, specularCount + 1)*mtlRefracColor;
         return refractionColor * mtlRefracRate + diffuseColor * (1 - mtlRefracRate);// + specColor;
     }
     else
@@ -364,8 +378,12 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         {
             return directLightSampling * intersectColor * 2;
         }
+        //TODO: 只需要在第一层使用caustic photon map
         return directLightSampling * intersectColor * 2 +
-            renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1) * intersectColor
-            * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2;
+            renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount) * intersectColor
+            * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
+                + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
+                                              radianceRenderer->stlCausticPhotons,
+                                              intersectPoint, intersectNormal, intersectColor);
     }
 }

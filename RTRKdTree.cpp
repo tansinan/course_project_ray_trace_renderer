@@ -184,6 +184,8 @@ void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const
 	RTRVector3D newPoint2 = ray.endPoint;
 	while (root->boundingBox.contain(newPoint2))
 	{
+        //qDebug() << root->boundingBox.point1.x()<< root->boundingBox.point1.y()<< root->boundingBox.point1.z();
+        //qDebug() << root->boundingBox.point2.x()<< root->boundingBox.point2.y()<< root->boundingBox.point2.z();
 		newPoint2 = newPoint2 * 2 - newPoint1;
 	}
 	double minZ = 1e10;
