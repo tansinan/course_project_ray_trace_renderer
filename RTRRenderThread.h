@@ -31,13 +31,16 @@ protected:
         const std::vector<Photon*>& photons,
         RTRVector3D location, RTRVector3D normal, RTRColor color);
 
+    RTRColor estimateDIBySamplingObject(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal);
+    RTRColor estimateDIBySamplingLightSource(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal);
+
     virtual void run() Q_DECL_OVERRIDE;
     /**
-    * @brief renderRay实现了光线追踪的核心算法——它渲染一个光路的“颜色”。
-    * @param ray需要进行追踪的光线
-    * @param iterationCount迭代次数，为方便调用，默认参数值为0
-    * @param elementFrom 发出该逆向光线的渲染元素。该参数主要用于防止发生光线求交误判为和自己想交的情况。
-    * @return 获得的颜色数值。
+    * @brief renderRay实锟斤拷锟剿癸拷锟斤拷追锟劫的猴拷锟斤拷锟姐法锟斤拷锟斤拷锟斤拷锟斤拷染一锟斤拷锟斤拷路锟侥★拷锟斤拷色锟斤拷锟斤拷
+    * @param ray锟斤拷要锟斤拷锟斤拷追锟劫的癸拷锟斤拷
+    * @param iterationCount锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷为锟斤拷锟斤拷锟斤拷锟矫ｏ拷默锟较诧拷锟斤拷值为0
+    * @param elementFrom 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟竭碉拷锟斤拷染元锟截★拷锟矫诧拷锟斤拷锟斤拷要锟斤拷锟节凤拷止锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷为锟斤拷锟皆硷拷锟诫交锟斤拷锟斤拷锟斤拷锟斤拷
+    * @return 锟斤拷锟矫碉拷锟斤拷色锟斤拷值锟斤拷
     */
     RTRColor renderRay(const RTRRay& ray, int iterationCount = 0,
         const RTRRenderElement* elementFrom = NULL,

@@ -22,6 +22,7 @@ public:
     double processTime = 0.0;
     RTRModel* model;
     QVector<RTRRenderElement*> elements;
+    QVector<RTRRenderElement*> emissionElements;
     RTRKdTree* elementsCache;
     RTRCamera* camera;
     QImage* image;

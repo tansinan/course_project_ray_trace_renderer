@@ -14,6 +14,7 @@ class RTRKdTree;
 class RTRCamera;
 class QImage;
 class RTRRenderElement;
+class RTRRenderer;
 
 struct NanoFlannPhotonAdaptor
 {
@@ -69,6 +70,7 @@ public:
 class RTRRadianceRenderer
 {
 public:
+    RTRRenderer *renderer = nullptr;
     RTRModel* model;
     QVector<RTRRenderElement*> elements;
     RTRKdTree* elementsCache;
@@ -86,6 +88,7 @@ public:
     //NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D> *diffusePhotonMap = nullptr;
     //NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D> *causticPhotonMap = nullptr;
 public:
+    RTRRadianceRenderer(RTRRenderer *renderer);
     void renderPhoton(
         RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
         RTRRenderElement *emissionElement, RTRColor lightColor, bool causticOnly);

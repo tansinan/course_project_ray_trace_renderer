@@ -4,6 +4,12 @@
 #include "RTRKdTree.h"
 #include "RTRRadianceRenderer.h"
 #include "RTRRenderElement.h"
+#include "RTRRenderer.h"
+
+RTRRadianceRenderer::RTRRadianceRenderer(RTRRenderer *renderer)
+{
+    this->renderer = renderer;
+}
 
 void RTRRadianceRenderer::renderPhoton(
     RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
@@ -179,16 +185,6 @@ void RTRRadianceRenderer::execute()
         delete causticPhotonMap;
     }
 
-    std::vector<RTRRenderElement*> emissionElements;
-    for (auto element : elements)
-    {
-        if (element->material->emissionStrength > 0.0001)
-        {
-            //qDebug() << "Emission object!";
-            emissionElements.push_back(element);
-        }
-    }
-
     /*for (int i = 0; i < 20; i++)
     {
         qDebug() << sampler->generateInteger(0, emissionElements.size() - 1);
@@ -199,6 +195,7 @@ void RTRRadianceRenderer::execute()
     const int CAUSTIC_PHOTON_COUNT = 10000000;
 
     //Process all kinds of photons
+    auto emissionElements = renderer->emissionElements;
     for(int i = 0; i < PHOTON_COUNT; i++)
     {
         auto chosenElementIndex = sampler->generateInteger(0, emissionElements.size() - 1);
@@ -225,7 +222,7 @@ void RTRRadianceRenderer::execute()
     }
 
     //Process only caustic photons
-    for(int i = 0; i < CAUSTIC_PHOTON_COUNT; i++)
+    /*for(int i = 0; i < CAUSTIC_PHOTON_COUNT; i++)
     {
         auto chosenElementIndex = sampler->generateInteger(0, emissionElements.size() - 1);
         auto chosenElement = emissionElements[chosenElementIndex];
@@ -245,7 +242,7 @@ void RTRRadianceRenderer::execute()
         {
             qDebug() << causticPhotons.size();
         }
-    }
+    }*/
 
 
 

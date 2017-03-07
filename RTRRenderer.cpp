@@ -68,7 +68,16 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
     }
 
 
-    radianceRenderer = new RTRRadianceRenderer();
+    radianceRenderer = new RTRRadianceRenderer(this);
+    for (auto element : elements)
+    {
+        if (element->material->emissionStrength > 0.0001)
+        {
+            //qDebug() << "Emission object!";
+            emissionElements.push_back(element);
+        }
+    }
+
     //创建Kd树以便加速搜索。
 
     elementsCache = RTRKdTree::create(elements);

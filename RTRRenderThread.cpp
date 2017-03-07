@@ -15,7 +15,7 @@ RTRRenderThread::RTRRenderThread(RTRRenderer* _renderer, int _threadIndex)
     renderResult = new RTRColor[renderer->image->width()*renderer->image->height()];
 }
 
-RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap, 
+RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     const std::vector<Photon*>& photons,
     RTRVector3D location, RTRVector3D normal, RTRColor color)
 {
@@ -43,6 +43,67 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
         }
     }
     return radioEst * (1 / PI / largestDistance);
+}
+
+RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, RTRVector3D location, RTRVector3D normal)
+{
+    RTRColor diEstimation(0.0, 0.0, 0.0);
+    const int EMISSION_SAMPLING_COUNT = 32;
+    for (int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
+    {
+        RTRVector3D directLightDirection;
+        for (;;)
+        {
+            directLightDirection = sampler.generateRandomDirection();
+            if (directLightDirection.dotProduct(normal) > 0) break;
+        }
+        RTRRay diRay(location, directLightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
+        RTRRenderElement* emissionElement = nullptr;
+        renderer->elementsCache->search(emissionElement, diRay, element);
+        if (emissionElement != nullptr && emissionElement->material->emissionStrength > 0.0001)
+        {
+            auto e = emissionElement->material->emissionStrength;
+            diEstimation = diEstimation + RTRColor(e, e, e)
+                * qAbs(directLightDirection.dotProduct(normal));
+        }
+    }
+    diEstimation /= EMISSION_SAMPLING_COUNT;
+    return diEstimation;
+}
+
+RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal)
+{
+    auto emissionElements = renderer->emissionElements;
+    const int EMISSION_SAMPLING_COUNT = 32;
+    RTRColor diEstimation(0.0, 0.0, 0.0);
+    for(int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
+    {
+        auto chosenElementIndex = sampler.generateInteger(0, emissionElements.size() - 1);
+        auto chosenElement = emissionElements[chosenElementIndex];
+        auto lightSource = sampler.generateRandomPointInTriangle(*chosenElement->triangle3D);
+        RTRVector3D lightDirection = location - lightSource;
+        //lightDirection.vectorNormalize();
+        RTRRay diRay(lightSource, lightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
+        RTRRenderElement* rayCastElement = nullptr;
+        renderer->elementsCache->search(rayCastElement, diRay, chosenElement);
+        RTRVector3D emissionNormal = chosenElement->triangle3D->plane.normal;
+        emissionNormal.vectorNormalize();
+        if (rayCastElement == element)
+        {
+            double cosDecay = -normal.dotProduct(diRay.direction);
+            if(cosDecay > 0.0)
+            {
+                auto e = chosenElement->material->emissionStrength;
+                diEstimation = diEstimation +
+                    RTRColor(e, e, e) / 3.1415926 / lightDirection.vectorLengthSquared()
+                    * qAbs(emissionNormal.dotProduct(diRay.direction))
+                    * cosDecay * chosenElement->triangle3D->area()
+                    * emissionElements.size();
+            }
+        }
+    }
+    diEstimation /= EMISSION_SAMPLING_COUNT;
+    return diEstimation;
 }
 
 void RTRRenderThread::start(int _xBegin, int _xEnd, int _yBegin, int _yEnd)
@@ -138,6 +199,8 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     RTRColor intersectColor(0.0, 0.0, 0.0);
     intersectElement->intersect(ray, intersectPoint, intersectNormal, intersectColor);
     intersectNormal.vectorNormalize();
+    //if(intersectNormal.dotProduct(ray.direction) > 0)
+    //    intersectNormal = intersectNormal * -1.0;
 
     //���������Ĳ������ԣ����������ʺͷ�����ɫ���߹⡢�����ʵ�
 
@@ -176,7 +239,6 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
 
     //Radiosity estimation at a diffusion surface. The current algorithm is based on
     //Monte-Carlo sampling on the emission object.
-    const int EMISSION_SAMPLING_COUNT = 32;
     RTRColor diffuseColor(0.0, 0.0, 0.0);
     /*for (int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
     {
@@ -351,39 +413,21 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
             if (nextDirection.dotProduct(intersectNormal) > 0) break;
         }
         RTRRay refractionRay(intersectPoint, nextDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-        RTRColor directLightSampling(0, 0, 0);
-        for (int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
-        {
-            RTRVector3D directLightDirection;
-            for (;;)
-            {
-                directLightDirection = sampler.generateRandomDirection();
-                if (directLightDirection.dotProduct(intersectNormal) > 0) break;
-            }
-            RTRRay diRay(intersectPoint, directLightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-            RTRRenderElement* emissionElement = nullptr;
-            renderer->elementsCache->search(emissionElement, diRay, intersectElement);
-            RTRVector3D normal;
-            if (emissionElement != nullptr && emissionElement->material->emissionStrength > 0.0001)
-            {
-                auto e = emissionElement->material->emissionStrength;
-                directLightSampling = directLightSampling + RTRColor(e, e, e) 
-                    * qAbs(directLightDirection.dotProduct(intersectNormal));
-            }
-        }
-        directLightSampling /= EMISSION_SAMPLING_COUNT;
+        //RTRColor diEstimation = estimateDIBySamplingObject(intersectElement, intersectPoint, intersectNormal);
+        RTRColor diEstimation = estimateDIBySamplingLightSource(intersectElement, intersectPoint, intersectNormal);
+        return diEstimation * intersectColor;
         RTRRenderElement* emissionElement = nullptr;
         renderer->elementsCache->search(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
-            return directLightSampling * intersectColor * 2;
+            return diEstimation * intersectColor * 2;
         }
         //TODO: 只需要在第一层使用caustic photon map
-        return directLightSampling * intersectColor * 2 +
+        return diEstimation * intersectColor * 2 +
             renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount) * intersectColor
             * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
-                + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
+                /*+ estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
                                               radianceRenderer->stlCausticPhotons,
-                                              intersectPoint, intersectNormal, intersectColor);
+                                              intersectPoint, intersectNormal, intersectColor)*/;
     }
 }
