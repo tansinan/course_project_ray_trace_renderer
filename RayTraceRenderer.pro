@@ -21,7 +21,14 @@ HEADERS += ./RTRModelPolygen.h \
     ./RTRRenderer.h \
     ./MainWindow.h \
     ./RTRViewer.h \
-    ./RTRRenderThread.h
+    ./RTRRenderThread.h \
+    PhotonMapGenerationProcedure.h \
+    Photon.h \
+    RTRRadianceRenderer.h \
+    SamplingUtil.h \
+    Geometry/NearestSearchKdTree.h \
+    libs/nanoflann/include/nanoflann.hpp \
+    RenderingOptions.h
 	
 SOURCES += ./MainWindow.cpp \
     ./RTRCamera.cpp \
@@ -38,3 +45,8 @@ SOURCES += ./MainWindow.cpp \
     ./RTRViewer.cpp \
     ./main.cpp \
     ./RTRRenderThread.cpp \
+    PhotonMapGenerationProcedure.cpp \
+    RTRRadianceRenderer.cpp \
+    SamplingUtil.cpp \
+    RTRMatrix.cpp \
+    RenderingOptions.cpp
