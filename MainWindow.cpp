@@ -108,6 +108,7 @@ void MainWindow::onRenderButtonPressed()
 		else invalidMaterial = true;
 		camera.offset.x() = 400;
 		camera.offset.y() = 300;
+        camera.imageDistance = camera.offset.x() / qTan(qDegreesToRadians(60.0));
 		camera.evaluateRotationMatrix();
 	}
 	if(invalidMaterial)

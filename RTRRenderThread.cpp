@@ -19,6 +19,7 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     const std::vector<Photon*>& photons,
     RTRVector3D location, RTRVector3D normal, RTRColor color)
 {
+    const int MIN_ESTIMATION_PHOTON_COUNT = 16;
     const int ESTIMATION_PHOTON_COUNT = 512;
     size_t photonIndex[ESTIMATION_PHOTON_COUNT];
     double photonDistance[ESTIMATION_PHOTON_COUNT];
@@ -29,8 +30,33 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
         std::cout << "error!" << std::endl;
     }
     double largestDistance = photonDistance[ESTIMATION_PHOTON_COUNT - 1];
+    RTRColor lastEstimation(0.0, 0.0, 0.0);
     RTRColor radioEst(0.0, 0.0, 0.0);
-    for (int i = 0; i < ESTIMATION_PHOTON_COUNT; i++)
+    for(int i = MIN_ESTIMATION_PHOTON_COUNT; i <= ESTIMATION_PHOTON_COUNT; i *= 2)
+    {
+        radioEst = estimateRadianceByPhotonMapInternal(photonMap, location, normal, photons, photonIndex,
+                                            photonDistance, i);
+        if(i == MIN_ESTIMATION_PHOTON_COUNT)
+        {
+            lastEstimation = radioEst;
+        }
+        else
+        {
+            double l1 = lastEstimation.r() + lastEstimation.g() + lastEstimation.b();
+            double l2 = radioEst.r() + radioEst.g() + radioEst.b();
+            if(l2 > 1.2*l1 || l2 < 0.8*l1)
+                return lastEstimation * color;
+        }
+    }
+    return radioEst * color;
+}
+
+RTRColor RTRRenderThread::estimateRadianceByPhotonMapInternal(PhotonKdTree* photonMap, RTRVector3D location, RTRVector3D normal,
+    const std::vector<Photon*>& photons, size_t *photonIndex, double *photonDistance, int photonCount)
+{
+    RTRColor radioEst(0.0, 0.0, 0.0);
+    double largestDistance = photonDistance[photonCount - 1];
+    for (int i = 0; i < photonCount; i++)
     {
         auto index = photonIndex[i];
         //qDebug() << index;
@@ -39,7 +65,7 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
         if (qAbs((photon->location - location).dotProduct(normal)) < 0.001)
         {
             double filter = (1 - qSqrt(photonDistance[i] / largestDistance)) * 3;
-            radioEst = radioEst + color * photon->color * filter;
+            radioEst = radioEst + photon->color * filter;
         }
     }
     return radioEst * (1 / PI / largestDistance);
@@ -74,7 +100,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, 
 RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal)
 {
     auto emissionElements = renderer->emissionElements;
-    const int EMISSION_SAMPLING_COUNT = 32;
+    const int EMISSION_SAMPLING_COUNT = 16;
     RTRColor diEstimation(0.0, 0.0, 0.0);
     for(int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
     {
@@ -415,15 +441,15 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         RTRRay refractionRay(intersectPoint, nextDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
         //RTRColor diEstimation = estimateDIBySamplingObject(intersectElement, intersectPoint, intersectNormal);
         RTRColor diEstimation = estimateDIBySamplingLightSource(intersectElement, intersectPoint, intersectNormal);
-        return diEstimation * intersectColor;
+        //return diEstimation * intersectColor;
         RTRRenderElement* emissionElement = nullptr;
         renderer->elementsCache->search(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
-            return diEstimation * intersectColor * 2;
+            return diEstimation * intersectColor;
         }
         //TODO: 只需要在第一层使用caustic photon map
-        return diEstimation * intersectColor * 2 +
+        return diEstimation * intersectColor +
             renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount) * intersectColor
             * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
                 /*+ estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,

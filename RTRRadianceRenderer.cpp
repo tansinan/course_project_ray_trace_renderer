@@ -191,27 +191,36 @@ void RTRRadianceRenderer::execute()
     }*/
 
     //QVector<Photon*> diffusePhotons;
-    const int PHOTON_COUNT = 200000;
+    const int PHOTON_COUNT = 1000000;
     const int CAUSTIC_PHOTON_COUNT = 10000000;
 
-    //Process all kinds of photons
     auto emissionElements = renderer->emissionElements;
+
+    // Build photon map, Pass 1: build diffuse photon map.
+    // This procedure builds a photon map that record every photon fallen
+    // on a diffuse surface, with is used for estimate radiance in the end
+    // of a path tracing.
     for(int i = 0; i < PHOTON_COUNT; i++)
     {
         auto chosenElementIndex = sampler->generateInteger(0, emissionElements.size() - 1);
         auto chosenElement = emissionElements[chosenElementIndex];
-        //RTRVector3D lightSource(-1.2 + sampler->generateRandomNumber(-1.0, 1.0)
-        //                                                , 0 + sampler->generateRandomNumber(-2.0, 2.0)
-        //                                                , 4.99);
         auto emissionStrength = chosenElement->material->emissionStrength /
-            PHOTON_COUNT * chosenElement->triangle3D->area() * emissionElements.size();
+            PHOTON_COUNT * chosenElement->triangle3D->area() * emissionElements.size() * 2;
         RTRColor lightColor(emissionStrength, emissionStrength, emissionStrength);
         auto lightSource = sampler->generateRandomPointInTriangle(*chosenElement->triangle3D);
+        RTRVector3D lightNormal = chosenElement->triangle3D->plane.normal * -1.0;
+        //qDebug() <<lightNormal.x() << lightNormal.y() << lightNormal.z();
         RTRVector3D lightDirection;
-        do {
+        for(;;)
+        {
             lightDirection = sampler->generateRandomDirection();
+            double cosValue = qAbs(lightDirection.dotProduct(lightNormal));
+            if(cosValue > sampler->generateRandomNumber()) break;
+        }
+        //do {
+        //    lightDirection = sampler->generateRandomDirection();
         //} while(lightDirection.z() > 0 || sampler->generateRandomNumber() > -lightDirection.z());
-        } while(lightDirection.x() < 0 || sampler->generateRandomNumber() < lightDirection.x());
+        //} while(lightDirection.x() < 0 || sampler->generateRandomNumber() < lightDirection.x());
         lightDirection.vectorNormalize();
         renderPhoton(lightSource, lightDirection, allPhotons, chosenElement,
             lightColor, false);

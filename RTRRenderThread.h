@@ -27,9 +27,12 @@ public slots:
     void start(int _xBegin, int _xEnd, int _yBegin, int _yEnd);
 
 protected:
-    virtual RTRColor estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
+    RTRColor estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
         const std::vector<Photon*>& photons,
         RTRVector3D location, RTRVector3D normal, RTRColor color);
+
+    RTRColor estimateRadianceByPhotonMapInternal(PhotonKdTree* photonMap, RTRVector3D location, RTRVector3D normal,
+                                                 const std::vector<Photon*>& photons, size_t *photonIndex, double *photonDistance, int photonCount);
 
     RTRColor estimateDIBySamplingObject(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal);
     RTRColor estimateDIBySamplingLightSource(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal);
