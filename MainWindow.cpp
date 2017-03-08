@@ -11,7 +11,7 @@
 #include "RTRRenderer.h"
 
 MainWindow::MainWindow(QWidget *parent)
-	:renderResult(800, 600, QImage::Format_ARGB32)
+    :renderResult(640, 480, QImage::Format_ARGB32)
 	,renderer(&renderResult)
 	,QMainWindow(parent)
 {
@@ -106,9 +106,9 @@ void MainWindow::onRenderButtonPressed()
 			camera.imageDistance = worldMaterial->getColorAt("image_distance", 0, 0).r();
 		}
 		else invalidMaterial = true;
-		camera.offset.x() = 400;
-		camera.offset.y() = 300;
-        camera.imageDistance = camera.offset.x() / qTan(qDegreesToRadians(60.0));
+        camera.offset.x() = 320;
+        camera.offset.y() = 240;
+        camera.imageDistance = camera.offset.x() / qTan(qDegreesToRadians(110.0 / 2));
 		camera.evaluateRotationMatrix();
 	}
 	if(invalidMaterial)

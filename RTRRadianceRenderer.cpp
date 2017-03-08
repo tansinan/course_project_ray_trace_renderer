@@ -21,7 +21,7 @@ void RTRRadianceRenderer::renderPhoton(
     bool refracInAir = true;
     RTRRenderElement* intersectElement = emissionElement;
     Photon::Type photonType = Photon::Type::DIRECT;
-    for(int i = 0; i < 32; i++)
+    for(int i = 0; i < 64; i++)
     {
 
         RTRRay ray(location, direction, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
@@ -140,7 +140,6 @@ void RTRRadianceRenderer::renderPhoton(
                 return;
             }
             RTRVector3D nextPhotonDirection;
-            //qDebug() << "N" << intersectNormal.x() << intersectNormal.y() << intersectNormal.z();
             if(intersectNormal.dotProduct(direction) > 0)
             {
                 intersectNormal = intersectNormal * -1.0;
@@ -152,16 +151,10 @@ void RTRRadianceRenderer::renderPhoton(
                 double project = nextPhotonDirection.dotProduct(intersectNormal);
                 if(project > sampler->generateRandomNumber())
                 {
-
-                break;
+                    break;
                 }
-                //if (i == 10) return;
             }
-            RTRColor diffuseColor(0.0, 0.0, 0.0);
-            RTRColor specColor;
-            double decay = nextPhotonDirection.dotProduct(intersectNormal);
             photonColor = intersectColor * photonColor;
-            //qDebug() << "DIFFUSE";
             location = intersectPoint;
             direction = nextPhotonDirection;
             //if(sampler->generateRandomNumber() > 0.9)
@@ -185,13 +178,7 @@ void RTRRadianceRenderer::execute()
         delete causticPhotonMap;
     }
 
-    /*for (int i = 0; i < 20; i++)
-    {
-        qDebug() << sampler->generateInteger(0, emissionElements.size() - 1);
-    }*/
-
-    //QVector<Photon*> diffusePhotons;
-    const int PHOTON_COUNT = 1000000;
+    const int PHOTON_COUNT = 2000000;
     const int CAUSTIC_PHOTON_COUNT = 10000000;
 
     auto emissionElements = renderer->emissionElements;
@@ -209,7 +196,6 @@ void RTRRadianceRenderer::execute()
         RTRColor lightColor(emissionStrength, emissionStrength, emissionStrength);
         auto lightSource = sampler->generateRandomPointInTriangle(*chosenElement->triangle3D);
         RTRVector3D lightNormal = chosenElement->triangle3D->plane.normal * -1.0;
-        //qDebug() <<lightNormal.x() << lightNormal.y() << lightNormal.z();
         RTRVector3D lightDirection;
         for(;;)
         {
@@ -217,17 +203,8 @@ void RTRRadianceRenderer::execute()
             double cosValue = qAbs(lightDirection.dotProduct(lightNormal));
             if(cosValue > sampler->generateRandomNumber()) break;
         }
-        //do {
-        //    lightDirection = sampler->generateRandomDirection();
-        //} while(lightDirection.z() > 0 || sampler->generateRandomNumber() > -lightDirection.z());
-        //} while(lightDirection.x() < 0 || sampler->generateRandomNumber() < lightDirection.x());
         lightDirection.vectorNormalize();
-        renderPhoton(lightSource, lightDirection, allPhotons, chosenElement,
-            lightColor, false);
-        if (allPhotons.size() % 1000 == 0)
-        {
-            qDebug() << allPhotons.size();
-        }
+        renderPhoton(lightSource, lightDirection, allPhotons, chosenElement, lightColor, false);
     }
 
     //Process only caustic photons

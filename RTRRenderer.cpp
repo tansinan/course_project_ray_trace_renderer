@@ -160,7 +160,7 @@ void RTRRenderer::allocateTask(int threadId)
             if (renderGridPass[i][j] < currentPass)
             {
                 renderGridPass[i][j]++;
-                renderThreads[threadId]->start(50 * i, 50 * i + 49, 50 * j, 50 * j + 49);
+                renderThreads[threadId]->start(40 * i, 40 * i + 39, 40 * j, 40 * j + 39);
                 return;
             }
         }
@@ -178,7 +178,7 @@ void RTRRenderer::allocateTask(int threadId)
     }
     currentPass++;
     renderGridPass[0][0]++;
-    renderThreads[threadId]->start(0, 49, 0, 49);
+    renderThreads[threadId]->start(0, 39, 0, 39);
 }
 
 void RTRRenderer::onRenderFinished(int threadId)

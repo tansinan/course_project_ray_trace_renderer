@@ -89,8 +89,7 @@ public:
     //NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D> *causticPhotonMap = nullptr;
 public:
     RTRRadianceRenderer(RTRRenderer *renderer);
-    void renderPhoton(
-        RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
+    void renderPhoton(RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
         RTRRenderElement *emissionElement, RTRColor lightColor, bool causticOnly);
     void execute();
 };

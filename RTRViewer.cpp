@@ -13,7 +13,7 @@ RTRViewer::RTRViewer(QWidget *parent, RTRRenderer* _renderer)
 	:QWidget(parent)
 {
 	renderer = _renderer;
-	setFixedSize(800,600);
+    setFixedSize(640, 480);
 }
 
 RTRViewer::~RTRViewer()
@@ -47,7 +47,7 @@ void RTRViewer::updateDisplay(bool forced)
 	{
 		for (int j = 0; j < renderer->image->height(); j++)
 		{
-			int pass = renderer->renderGridPass[i / 50][j / 50];
+            int pass = renderer->renderGridPass[i / 40][j / 40];
 			if (pass != 0)
 			{
 				renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass);
@@ -63,8 +63,8 @@ void RTRViewer::updateDisplay(bool forced)
 		{
 			for(int j =renderer->renderThreads[k]->yBegin,jj=0;j<=renderer->renderThreads[k]->yEnd;j++,jj++)
 			{
-				int pass = renderer->renderGridPass[i / 50][j / 50];
-				if(ii<8||ii>42||jj<8||jj>42)
+                int pass = renderer->renderGridPass[i / 40][j / 40];
+                if(ii<8||ii>32||jj<8||jj>32)
 				{
 					if (pass != 0) renderer->renderPixel(i, j, 0, renderer->renderResult[i*renderer->image->height() + j] / pass * 2
 							+ RTRColor(0.25,0.25,0.25));

@@ -100,7 +100,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, 
 RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *element, RTRVector3D location, RTRVector3D normal)
 {
     auto emissionElements = renderer->emissionElements;
-    const int EMISSION_SAMPLING_COUNT = 16;
+    const int EMISSION_SAMPLING_COUNT = 8;
     RTRColor diEstimation(0.0, 0.0, 0.0);
     for(int i = 0; i < EMISSION_SAMPLING_COUNT; i++)
     {
@@ -121,7 +121,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *elem
             {
                 auto e = chosenElement->material->emissionStrength;
                 diEstimation = diEstimation +
-                    RTRColor(e, e, e) / 3.1415926 / lightDirection.vectorLengthSquared()
+                    RTRColor(e, e, e) / PI / lightDirection.vectorLengthSquared()
                     * qAbs(emissionNormal.dotProduct(diRay.direction))
                     * cosDecay * chosenElement->triangle3D->area()
                     * emissionElements.size();
