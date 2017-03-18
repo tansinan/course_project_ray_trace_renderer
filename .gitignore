@@ -205,4 +205,4 @@ FakesAssemblies/
 *.opt
 
 #Model object
-!samples/*.obj
+samples/
