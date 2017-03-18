@@ -17,10 +17,12 @@ RTRRenderThread::RTRRenderThread(RTRRenderer* _renderer, int _threadIndex)
 
 RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     const std::vector<Photon*>& photons,
-    RTRVector3D location, RTRVector3D normal, RTRColor color)
+    RTRVector3D location, RTRVector3D normal)
 {
+    if(photonMap->size() == 0)
+        return RTRColor(0.0, 0.0, 0.0);
     const int MIN_ESTIMATION_PHOTON_COUNT = 16;
-    const int ESTIMATION_PHOTON_COUNT = 512;
+    const int ESTIMATION_PHOTON_COUNT = 256;
     size_t photonIndex[ESTIMATION_PHOTON_COUNT];
     double photonDistance[ESTIMATION_PHOTON_COUNT];
     nanoflann::KNNResultSet<double> resultSet(ESTIMATION_PHOTON_COUNT);
@@ -29,7 +31,6 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     if (!photonMap->findNeighbors(resultSet, query_pt, nanoflann::SearchParams())) {
         std::cout << "error!" << std::endl;
     }
-    double largestDistance = photonDistance[ESTIMATION_PHOTON_COUNT - 1];
     RTRColor lastEstimation(0.0, 0.0, 0.0);
     RTRColor radioEst(0.0, 0.0, 0.0);
     for(int i = MIN_ESTIMATION_PHOTON_COUNT; i <= ESTIMATION_PHOTON_COUNT; i *= 2)
@@ -45,10 +46,10 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
             double l1 = lastEstimation.r() + lastEstimation.g() + lastEstimation.b();
             double l2 = radioEst.r() + radioEst.g() + radioEst.b();
             if(l2 > 1.2*l1 || l2 < 0.8*l1)
-                return lastEstimation * color;
+                return lastEstimation;
         }
     }
-    return radioEst * color;
+    return radioEst;
 }
 
 RTRColor RTRRenderThread::estimateRadianceByPhotonMapInternal(PhotonKdTree* photonMap, RTRVector3D location, RTRVector3D normal,
@@ -59,7 +60,6 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMapInternal(PhotonKdTree* phot
     for (int i = 0; i < photonCount; i++)
     {
         auto index = photonIndex[i];
-        //qDebug() << index;
         auto photon = photons[index];
         photon->direction.vectorNormalize();
         if (qAbs((photon->location - location).dotProduct(normal)) < 0.001)
@@ -426,7 +426,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         if (diffuseCount >= 1) {
             return estimateRadianceByPhotonMap(radianceRenderer->diffusePhotonMap,
                 radianceRenderer->stlDiffusePhotons,
-                intersectPoint, intersectNormal, intersectColor);
+                intersectPoint, intersectNormal) * intersectColor;
         }
         RTRVector3D nextDirection;
         if (intersectNormal.dotProduct(ray.direction) > 0)
@@ -446,14 +446,16 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         renderer->elementsCache->search(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
-            return diEstimation * intersectColor;
+            return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
+                                                                               radianceRenderer->stlCausticPhotons,
+                                                                               intersectPoint, intersectNormal)) * intersectColor;
         }
         //TODO: 只需要在第一层使用caustic photon map
-        return diEstimation * intersectColor +
-            renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount) * intersectColor
+        return (diEstimation +
+            renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount)
             * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
-                /*+ estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
+                + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
                                               radianceRenderer->stlCausticPhotons,
-                                              intersectPoint, intersectNormal, intersectColor)*/;
+                                              intersectPoint, intersectNormal)) * intersectColor;
     }
 }

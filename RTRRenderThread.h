@@ -29,7 +29,7 @@ public slots:
 protected:
     RTRColor estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
         const std::vector<Photon*>& photons,
-        RTRVector3D location, RTRVector3D normal, RTRColor color);
+        RTRVector3D location, RTRVector3D normal);
 
     RTRColor estimateRadianceByPhotonMapInternal(PhotonKdTree* photonMap, RTRVector3D location, RTRVector3D normal,
                                                  const std::vector<Photon*>& photons, size_t *photonIndex, double *photonDistance, int photonCount);
