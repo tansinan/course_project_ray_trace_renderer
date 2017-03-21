@@ -1,13 +1,13 @@
-#include "RTRKdTree.h"
+#include "SimpleKdTreeRayTracingKernel.h"
 #include <qmath.h>
 
-RTRKdTree::RTRKdTree()
+SimpleKdTreeRayTracingKernel::SimpleKdTreeRayTracingKernel()
 {
 
 }
 
 
-void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth, int maxDepth)
+void SimpleKdTreeRayTracingKernel::construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth, int maxDepth)
 {
 	//Thrink the size first
 	RTRBoundingBox boundingBox;
@@ -128,7 +128,7 @@ void RTRKdTree::construct(Node* parent, const QVector<RTRRenderElement*>& elemen
 	construct(nodeLarge, bestNewTableLarge, depth + 1, maxDepth);
 }
 
-void RTRKdTree::cleanUp(Node* node)
+void SimpleKdTreeRayTracingKernel::cleanUp(Node* node)
 {
 	if (node->large == NULL) return;
 	cleanUp(node->large);
@@ -144,10 +144,10 @@ void RTRKdTree::cleanUp(Node* node)
 	}
 }
 
-RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
+SimpleKdTreeRayTracingKernel* SimpleKdTreeRayTracingKernel::create(const QVector<RTRRenderElement*>& elementTable)
 {
 	int maxDepth = log2(elementTable.size());
-	RTRKdTree* ret = new RTRKdTree();
+	SimpleKdTreeRayTracingKernel* ret = new SimpleKdTreeRayTracingKernel();
 	if (elementTable.size() == 0) return NULL;
 	RTRBoundingBox boundingBox;
 	for (int i = 0; i<3; i++)
@@ -178,7 +178,7 @@ RTRKdTree* RTRKdTree::create(const QVector<RTRRenderElement*>& elementTable)
 	return ret;
 }
 
-void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const
+void SimpleKdTreeRayTracingKernel::search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const
 {
 	RTRVector3D newPoint1 = ray.beginningPoint;
 	RTRVector3D newPoint2 = ray.endPoint;
@@ -195,7 +195,7 @@ void RTRKdTree::search(RTRRenderElement*& searchResult, const RTRRay& ray, const
 	search(root, searchResult,temp1,temp2, minZ, elementFrom);
 }
 
-void RTRKdTree::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
+void SimpleKdTreeRayTracingKernel::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
 	RTRRay& ray, double& minZ, const RTRRenderElement* elementFrom) const
 {
     if (!RTRGeometry::intersect(node->boundingBox, segment)) return;

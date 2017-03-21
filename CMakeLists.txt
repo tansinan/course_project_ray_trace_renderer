@@ -8,6 +8,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+find_package(Embree 2 REQUIRED)
+include_directories(${EMBREE_INCLUDE_PATH})
+
 include_directories(
   ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS})
 
@@ -22,7 +25,6 @@ add_executable(${PROJECT_NAME}
     RTRCamera.cpp
     RTRColor.cpp
     RTRGeometry.cpp
-    RTRKdTree.cpp
     Light/RTRLightPoint.cpp
     RTRMaterial.cpp
     RTRModel.cpp
@@ -37,5 +39,7 @@ add_executable(${PROJECT_NAME}
     RTRRadianceRenderer.cpp
     SamplingUtil.cpp
     RTRMatrix.cpp
-    RenderingOptions.cpp)
+    RenderingOptions.cpp
+    RayTracing/SimpleKdTreeRayTracingKernel.cpp
+)
 qt5_use_modules(${PROJECT_NAME} Widgets Gui Core)

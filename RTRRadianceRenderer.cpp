@@ -1,7 +1,7 @@
 #include <random>
 #include <vector>
 #include <QVector>
-#include "RTRKdTree.h"
+#include "RayTracing/SimpleKdTreeRayTracingKernel.h"
 #include "RTRRadianceRenderer.h"
 #include "RTRRenderElement.h"
 #include "RTRRenderer.h"

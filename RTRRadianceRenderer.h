@@ -10,7 +10,7 @@
 #include "SamplingUtil.h"
 
 class RTRModel;
-class RTRKdTree;
+class SimpleKdTreeRayTracingKernel;
 class RTRCamera;
 class QImage;
 class RTRRenderElement;
@@ -73,7 +73,7 @@ public:
     RTRRenderer *renderer = nullptr;
     RTRModel* model;
     QVector<RTRRenderElement*> elements;
-    RTRKdTree* elementsCache;
+    SimpleKdTreeRayTracingKernel* elementsCache;
     RTRCamera* camera;
     QImage* image;
     SamplingUtil* sampler;
