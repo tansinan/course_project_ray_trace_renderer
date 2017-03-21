@@ -6,6 +6,13 @@ SimpleKdTreeRayTracingKernel::SimpleKdTreeRayTracingKernel()
 
 }
 
+SimpleKdTreeRayTracingKernel::~SimpleKdTreeRayTracingKernel()
+{
+    if(root != nullptr)
+    {
+        cleanUp(root);
+    }
+}
 
 void SimpleKdTreeRayTracingKernel::construct(Node* parent, const QVector<RTRRenderElement*>& elementTable, int depth, int maxDepth)
 {
@@ -144,11 +151,10 @@ void SimpleKdTreeRayTracingKernel::cleanUp(Node* node)
 	}
 }
 
-SimpleKdTreeRayTracingKernel* SimpleKdTreeRayTracingKernel::create(const QVector<RTRRenderElement*>& elementTable)
+void SimpleKdTreeRayTracingKernel::buildIndex(const QVector<RTRRenderElement*>& elementTable)
 {
 	int maxDepth = log2(elementTable.size());
-	SimpleKdTreeRayTracingKernel* ret = new SimpleKdTreeRayTracingKernel();
-	if (elementTable.size() == 0) return NULL;
+	if (elementTable.size() == 0) return;
 	RTRBoundingBox boundingBox;
 	for (int i = 0; i<3; i++)
 	{
@@ -170,15 +176,14 @@ SimpleKdTreeRayTracingKernel* SimpleKdTreeRayTracingKernel::create(const QVector
 		boundingBox.point1(i) -= 0.001;
 		boundingBox.point2(i) += 0.001;
 	}
-	ret->root = new Node();
-	ret->root->boundingBox = boundingBox;
-	ret->root->splitMethod = Node::SPLIT_BY_X;
-	ret->construct(ret->root, elementTable, 0, maxDepth);
+	root = new Node();
+	root->boundingBox = boundingBox;
+	root->splitMethod = Node::SPLIT_BY_X;
+	construct(root, elementTable, 0, maxDepth);
 	//ret->cleanUp(ret->root);
-	return ret;
 }
 
-void SimpleKdTreeRayTracingKernel::search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const
+void SimpleKdTreeRayTracingKernel::intersect(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const
 {
 	RTRVector3D newPoint1 = ray.beginningPoint;
 	RTRVector3D newPoint2 = ray.endPoint;
@@ -192,10 +197,10 @@ void SimpleKdTreeRayTracingKernel::search(RTRRenderElement*& searchResult, const
 	searchResult = NULL;
 	RTRSegment temp1 =  RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
 	RTRSegment temp2 =  RTRSegment(newPoint1, newPoint2, RTRSegment::CREATE_FROM_POINTS);
-	search(root, searchResult,temp1,temp2, minZ, elementFrom);
+    intersect(root, searchResult,temp1,temp2, minZ, elementFrom);
 }
 
-void SimpleKdTreeRayTracingKernel::search(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
+void SimpleKdTreeRayTracingKernel::intersect(Node* node, RTRRenderElement*& searchResult, RTRSegment& segment,
 	RTRRay& ray, double& minZ, const RTRRenderElement* elementFrom) const
 {
     if (!RTRGeometry::intersect(node->boundingBox, segment)) return;
@@ -260,12 +265,12 @@ void SimpleKdTreeRayTracingKernel::search(Node* node, RTRRenderElement*& searchR
 	segmentSmallTemp.endPoint = segmentLargeTemp.beginningPoint = midPoint;
 	if (qrand() % 2 == 0)
 	{
-		search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
-		search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
+        intersect(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
+        intersect(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
 	}
 	else
 	{
-		search(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
-		search(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
+        intersect(node->small, searchResult, segmentSmallTemp, ray, minZ, elementFrom);
+        intersect(node->large, searchResult, segmentLargeTemp, ray, minZ, elementFrom);
 	}
 }

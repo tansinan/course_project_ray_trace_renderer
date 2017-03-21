@@ -40,6 +40,7 @@ add_executable(${PROJECT_NAME}
     SamplingUtil.cpp
     RTRMatrix.cpp
     RenderingOptions.cpp
+    RayTracing/AbstractRayTracingKernel.cpp
     RayTracing/SimpleKdTreeRayTracingKernel.cpp
 )
 qt5_use_modules(${PROJECT_NAME} Widgets Gui Core)

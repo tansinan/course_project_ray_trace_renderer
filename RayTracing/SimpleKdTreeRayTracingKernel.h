@@ -4,7 +4,7 @@
 #include "RTRRenderElement.h"
 #include "AbstractRayTracingKernel.h"
 
-class SimpleKdTreeRayTracingKernel
+class SimpleKdTreeRayTracingKernel : public AbstractRayTracingKernel
 {
 protected:
     class Node
@@ -23,11 +23,10 @@ protected:
 
 protected:
     int nodeCount = 0;
-    Node* root;
-    SimpleKdTreeRayTracingKernel();
+    Node* root = nullptr;
 
 protected:
-    void search(Node* node, RTRRenderElement*& searchResult,
+    void intersect(Node* node, RTRRenderElement*& searchResult,
         RTRSegment& segment, RTRRay& originalRay, double& minZ,
         const RTRRenderElement* elementFrom) const;
     void construct(
@@ -36,9 +35,12 @@ protected:
     void cleanUp(Node* node);
 
 public:
-    static SimpleKdTreeRayTracingKernel* create(const QVector<RTRRenderElement*>& elementTable);
-    void search(RTRRenderElement*& searchResult, const RTRRay& ray, const RTRRenderElement* elementFrom) const;
-
+    SimpleKdTreeRayTracingKernel();
+    ~SimpleKdTreeRayTracingKernel() override;
+    void buildIndex(const QVector<RTRRenderElement*>& elementTable) override;
+    void intersect(
+        RTRRenderElement*& searchResult, const RTRRay& ray,
+        const RTRRenderElement* elementFrom) const override;
 
 };
 

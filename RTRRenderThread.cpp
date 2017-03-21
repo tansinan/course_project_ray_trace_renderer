@@ -85,7 +85,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, 
         }
         RTRRay diRay(location, directLightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
         RTRRenderElement* emissionElement = nullptr;
-        renderer->elementsCache->search(emissionElement, diRay, element);
+        renderer->elementsCache->intersect(emissionElement, diRay, element);
         if (emissionElement != nullptr && emissionElement->material->emissionStrength > 0.0001)
         {
             auto e = emissionElement->material->emissionStrength;
@@ -111,7 +111,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *elem
         //lightDirection.vectorNormalize();
         RTRRay diRay(lightSource, lightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
         RTRRenderElement* rayCastElement = nullptr;
-        renderer->elementsCache->search(rayCastElement, diRay, chosenElement);
+        renderer->elementsCache->intersect(rayCastElement, diRay, chosenElement);
         RTRVector3D emissionNormal = chosenElement->triangle3D->plane.normal;
         emissionNormal.vectorNormalize();
         if (rayCastElement == element)
@@ -212,7 +212,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     //����Ԫ��
 
     RTRRenderElement* intersectElement = NULL;
-    renderer->elementsCache->search(intersectElement, ray, elementFrom);
+    renderer->elementsCache->intersect(intersectElement, ray, elementFrom);
 
     //�������߲����κ������ཻ�ǿ϶��ǿ���һ���ˡ���
 
@@ -443,7 +443,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         RTRColor diEstimation = estimateDIBySamplingLightSource(intersectElement, intersectPoint, intersectNormal);
         //return diEstimation * intersectColor;
         RTRRenderElement* emissionElement = nullptr;
-        renderer->elementsCache->search(emissionElement, refractionRay, intersectElement);
+        renderer->elementsCache->intersect(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
             return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,

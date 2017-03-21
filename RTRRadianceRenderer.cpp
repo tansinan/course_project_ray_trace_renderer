@@ -25,7 +25,7 @@ void RTRRadianceRenderer::renderPhoton(
     {
 
         RTRRay ray(location, direction, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-        elementsCache->search(intersectElement, ray, intersectElement);
+        elementsCache->intersect(intersectElement, ray, intersectElement);
         if(intersectElement == nullptr)
         {
             return;

@@ -80,7 +80,8 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
 
     //创建Kd树以便加速搜索。
 
-    elementsCache = SimpleKdTreeRayTracingKernel::create(elements);
+    elementsCache = new SimpleKdTreeRayTracingKernel();
+    elementsCache->buildIndex(elements);
 
     renderThreads = new RTRRenderThread*[8];
     for (int i = 0; i < 8; i++)
