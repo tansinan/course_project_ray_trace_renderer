@@ -32,6 +32,7 @@ public:
      * @brief reflectionRate表示物体的反射强度
      */
     double reflectionRate = 0.0;
+    double reflectionGlossiness = 0.0;
 
     /**
      * @brief reflectionColor表示物体的反射颜色
@@ -42,6 +43,7 @@ public:
      * @brief refractionRate表示物体的折射强度
      */
     double refractionRate = 0.0;
+    double refractionGlossiness = 0.0;
 
     /**
      * @brief refractionRate表示物体的折射颜色

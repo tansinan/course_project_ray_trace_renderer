@@ -189,7 +189,10 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
                 currentMaterial->setColorProperty("reflection_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
             }
             else if (command == "reflection_glossiness")
+            {
+                currentMaterial->reflectionGlossiness = param[0].toDouble();
                 currentMaterial->setColorProperty("reflection_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            }
             else if (command == "refraction_rate")
             {
                 currentMaterial->refractionRate = param[0].toDouble();
@@ -206,7 +209,10 @@ bool RTRModel::loadMaterialLibraryFromMtlFile(const QString& filePath)
                 currentMaterial->setColorProperty("refraction_color", RTRColor(param[0].toDouble(), param[1].toDouble(), param[2].toDouble()));
             }
             else if (command == "refraction_glossiness")
+            {
+                currentMaterial->refractionGlossiness = param[0].toDouble();
                 currentMaterial->setColorProperty("refraction_glossiness", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
+            }
             else if (command == "fod_aperture")
                 currentMaterial->setColorProperty("fod_aperture", RTRColor(param[0].toDouble(), param[0].toDouble(), param[0].toDouble()));
             else if (command == "fod_focus")

@@ -1,3 +1,4 @@
+#include <Eigen/Dense>
 #include <random>
 #include <vector>
 #include <QVector>
@@ -5,6 +6,8 @@
 #include "RTRRadianceRenderer.h"
 #include "RTRRenderElement.h"
 #include "RTRRenderer.h"
+
+//using Eigen;
 
 RTRRadianceRenderer::RTRRadianceRenderer(RTRRenderer *renderer)
 {
@@ -37,26 +40,16 @@ void RTRRadianceRenderer::renderPhoton(
 
         double reflectionRate = intersectElement->material->reflectionRate;
         RTRColor mtlReflColor= intersectElement->material->reflectionColor;
-        double mtlReflGloss = 1.0;
-        RTRColor mtlSpecColor;
+        double mtlReflGloss = intersectElement->material->reflectionGlossiness;
+        //RTRColor mtlSpecColor = intersectElement->material->specularColor;
         double mtlRefracRate = intersectElement->material->refractionRate;
         double mtlRefracIndex = intersectElement->material->refractionIndex;
-        RTRColor mtlRefracColor(1.0, 1.0, 1.0);
-        double mtlRefracGloss = 1.0;
-        double mtlDiffuseRate = 0.0;
+        RTRColor mtlRefracColor = intersectElement->material->refractionColor;
+        double mtlRefracGloss = intersectElement->material->refractionGlossiness;
 
-        if (intersectElement->material->getPropertyType("reflection_glossiness") == RTRMaterial::TYPE_COLOR)
-            mtlReflGloss = intersectElement->material->getColorAt("reflection_glossiness", 0, 0).r();
+        //if (intersectElement->material->getPropertyType("specular") == RTRMaterial::TYPE_COLOR)
+        //    mtlSpecColor = intersectElement->material->getColorAt("specular", 0, 0);
 
-        if (intersectElement->material->getPropertyType("specular") == RTRMaterial::TYPE_COLOR)
-            mtlSpecColor = intersectElement->material->getColorAt("specular", 0, 0);
-
-        if (intersectElement->material->getPropertyType("refraction_color") == RTRMaterial::TYPE_COLOR)
-            mtlRefracColor = intersectElement->material->getColorAt("refraction_color", 0, 0);
-        if (intersectElement->material->getPropertyType("refraction_glossiness") == RTRMaterial::TYPE_COLOR)
-            mtlRefracGloss = intersectElement->material->getColorAt("refraction_glossiness", 0, 0).r();
-
-        mtlDiffuseRate = intersectElement->material->getColorAt("Kd", 0, 0).r();
         //Decide which kind of intersection is happening
         if (intersectElement->material->emissionStrength > 0.001)
         {
@@ -187,6 +180,7 @@ void RTRRadianceRenderer::execute()
     // This procedure builds a photon map that record every photon fallen
     // on a diffuse surface, with is used for estimate radiance in the end
     // of a path tracing.
+    qDebug() << clock() / (double)CLOCKS_PER_SEC;
     for(int i = 0; i < PHOTON_COUNT; i++)
     {
         auto chosenElementIndex = sampler->generateInteger(0, emissionElements.size() - 1);
@@ -207,6 +201,7 @@ void RTRRadianceRenderer::execute()
         if (allPhotons.size() % 10000 == 0)
             qDebug() << allPhotons.size();
     }
+    qDebug() << clock() / (double)CLOCKS_PER_SEC;
 
     // Build photon map, Pass 1: build caustic photon map.
     // This procedure builds a photon map that record only caustic photon fallen
