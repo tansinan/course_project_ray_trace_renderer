@@ -112,9 +112,8 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
     radianceRenderer->sampler = &this->sampler;
     radianceRenderer->execute();
 
-    auto& photons = radianceRenderer->allPhotons;
+    auto& photons = radianceRenderer->diffusePhotons;
 
-    qDebug() << photons.size();
     for(int i = 0; i < image->width(); i++)
     {
         for(int j = 0; j < image->height(); j++)
@@ -122,20 +121,6 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
             image->setPixel(i, j, RTRColor(0,0,0).toQtColor().rgb());
         }
     }
-    int orr = 0;
-    for(int i = 0; i < photons.size(); i++)
-    {
-        auto point = camera->transformPoint(photons[i]->location);
-        //qDebug() << point.x() << point.y();
-        //qDebug() << photons[i].color.r() << photons[i].color.g() << photons[i].color.b();
-        if(point.x() < 0 || point.y() < 0 || point.x() > image->width() - 1 || point.y() > image->height() - 1)
-        {
-            orr++;
-            continue;
-        }
-        renderPixel(point.x(), point.y(), 1.0, photons[i]->color);
-    }
-    qDebug() << "orr" << orr;
     allocateTask();
     emit renderStatusChanged();
     return true;

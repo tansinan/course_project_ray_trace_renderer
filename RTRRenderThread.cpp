@@ -240,27 +240,12 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     double mtlRefracGloss = 1.0;
     double mtlEmissionStrength = intersectElement->material->emissionStrength;
 
-    //处理反射相关属性
-
-    //if (intersectElement->material->getPropertyType("reflection_glossiness") == RTRMaterial::TYPE_COLOR)
-    //  mtlReflGloss = intersectElement->material->getColorAt("reflection_glossiness", 0, 0).r();
-
-    //�߹���������
-
-    //if (intersectElement->material->getPropertyType("specular") == RTRMaterial::TYPE_COLOR)
-    //  mtlSpecColor = intersectElement->material->getColorAt("specular", 0, 0);
-
-    //������������
-
-    //if (intersectElement->material->getPropertyType("refraction_glossiness") == RTRMaterial::TYPE_COLOR)
-    //mtlRefracGloss = intersectElement->material->getColorAt("refraction_glossiness", 0, 0).r();
-
 
     RTRColor mtlAmbientColor;
-    if (intersectElement->material->getPropertyType("ambient") == RTRMaterial::TYPE_COLOR)
+    /*if (intersectElement->material->getPropertyType("ambient") == RTRMaterial::TYPE_COLOR)
     {
         mtlAmbientColor = intersectElement->material->getColorAt("ambient", 0, 0);
-    }
+    }*/
 
 
     //Radiosity estimation at a diffusion surface. The current algorithm is based on
@@ -321,7 +306,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
 
     /*diffuseColor =
         estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
-            radianceRenderer->stlCausticPhotons,
+            radianceRenderer->causticPhotons,
             intersectPoint, intersectNormal, intersectColor) / 500;*/
 
 
@@ -359,7 +344,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     //�����������Ƶ���ʱ�����������ͷ�������
 
     /*if (iterationCount >= 5) return estimateRadianceByPhotonMap(radianceRenderer->diffusePhotonMap,
-        radianceRenderer->stlDiffusePhotons,
+        radianceRenderer->diffusePhotons,
         intersectPoint, intersectNormal, intersectColor) / 200;*/// + specColor;
 
     //处理发光材质，原则上来说如果有发光材质应当直接返回光源亮度．
@@ -425,7 +410,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     {
         if (diffuseCount >= 1) {
             return estimateRadianceByPhotonMap(radianceRenderer->diffusePhotonMap,
-                radianceRenderer->stlDiffusePhotons,
+                radianceRenderer->diffusePhotons,
                 intersectPoint, intersectNormal) * intersectColor;
         }
         RTRVector3D nextDirection;
@@ -447,7 +432,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
             return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
-                                                                               radianceRenderer->stlCausticPhotons,
+                                                                               radianceRenderer->causticPhotons,
                                                                                intersectPoint, intersectNormal)) * intersectColor;
         }
         //TODO: 只需要在第一层使用caustic photon map
@@ -455,7 +440,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
             renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount)
             * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
                 + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
-                                              radianceRenderer->stlCausticPhotons,
+                                              radianceRenderer->causticPhotons,
                                               intersectPoint, intersectNormal)) * intersectColor;
     }
 }

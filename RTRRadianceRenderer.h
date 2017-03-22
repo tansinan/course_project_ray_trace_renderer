@@ -2,6 +2,7 @@
 #define __TINY_RENDERER_RTRRAIANCERENDERER_H__
 
 #include <vector>
+#include <map>
 #include <QVector>
 #include <Geometry/NearestSearchKdTree.h>
 #include "libs/nanoflann/include/nanoflann.hpp"
@@ -77,19 +78,22 @@ public:
     RTRCamera* camera;
     QImage* image;
     SamplingUtil* sampler;
-    QVector<Photon*> allPhotons;
-    QVector<Photon*> causticPhotons;
-    std::vector<Photon*> stlCausticPhotons;
-    std::vector<Photon*> stlDiffusePhotons;
+    std::vector<Photon*> causticPhotons;
+    std::vector<Photon*> diffusePhotons;
     NanoFlannPhotonAdaptor *causticPhotonAdapter;
     NanoFlannPhotonAdaptor *diffusePhotonAdapter;
     PhotonKdTree *diffusePhotonMap = nullptr;
     PhotonKdTree *causticPhotonMap = nullptr;
+    std::map<RTRRenderElement*, std::vector<Photon*>> elementDiffusePhotons;
+    std::map<RTRRenderElement*, std::vector<Photon*>> elementCausticPhotons;
+    std::map<RTRRenderElement*, PhotonKdTree*> elementDiffusePhotonMap;
+    std::map<RTRRenderElement*, PhotonKdTree*> elementCausticPhotonMap;
+    
     //NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D> *diffusePhotonMap = nullptr;
     //NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D> *causticPhotonMap = nullptr;
 public:
     RTRRadianceRenderer(RTRRenderer *renderer);
-    void renderPhoton(RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
+    void renderPhoton(RTRVector3D location, RTRVector3D direction, std::vector<Photon*> &result,
         RTRRenderElement *emissionElement, RTRColor lightColor, bool causticOnly);
     void execute();
 };

@@ -15,7 +15,7 @@ RTRRadianceRenderer::RTRRadianceRenderer(RTRRenderer *renderer)
 }
 
 void RTRRadianceRenderer::renderPhoton(
-    RTRVector3D location, RTRVector3D direction, QVector<Photon*> &result,
+    RTRVector3D location, RTRVector3D direction, std::vector<Photon*> &result,
     RTRRenderElement *emissionElement, RTRColor lightColor, bool causticOnly)
 {
     RTRColor photonColor = lightColor;
@@ -126,7 +126,8 @@ void RTRRadianceRenderer::renderPhoton(
                 photon->direction = direction;
                 photon->location = intersectPoint;
                 photon->type = photonType;
-                result.append(photon);
+                photon->intersectElement = intersectElement;
+                result.push_back(photon);
             }
             if(causticOnly)
             {
@@ -139,9 +140,13 @@ void RTRRadianceRenderer::renderPhoton(
             }
             for(;;)
             {
-
                 nextPhotonDirection = sampler->generateRandomDirection();
                 double project = nextPhotonDirection.dotProduct(intersectNormal);
+                if(project < 0.0)
+                {
+                    project = -project;
+                    nextPhotonDirection = nextPhotonDirection * -1;
+                }
                 if(project > sampler->generateRandomNumber())
                 {
                     break;
@@ -180,7 +185,6 @@ void RTRRadianceRenderer::execute()
     // This procedure builds a photon map that record every photon fallen
     // on a diffuse surface, with is used for estimate radiance in the end
     // of a path tracing.
-    qDebug() << clock() / (double)CLOCKS_PER_SEC;
     for(int i = 0; i < PHOTON_COUNT; i++)
     {
         auto chosenElementIndex = sampler->generateInteger(0, emissionElements.size() - 1);
@@ -197,13 +201,12 @@ void RTRRadianceRenderer::execute()
             double cosValue = qAbs(lightDirection.dotProduct(lightNormal));
             if(cosValue > sampler->generateRandomNumber()) break;
         }
-        renderPhoton(lightSource, lightDirection, allPhotons, chosenElement, lightColor, false);
-        if (allPhotons.size() % 10000 == 0)
-            qDebug() << allPhotons.size();
+        renderPhoton(lightSource, lightDirection, diffusePhotons, chosenElement, lightColor, false);
+        if (diffusePhotons.size() % 10000 == 0)
+            qDebug() << diffusePhotons.size();
     }
-    qDebug() << clock() / (double)CLOCKS_PER_SEC;
-
-    // Build photon map, Pass 1: build caustic photon map.
+    
+    // Build photon map, Pass 2: build caustic photon map.
     // This procedure builds a photon map that record only caustic photon fallen
     // on a diffuse surface, with is used for estimate caustic without path tracing.
     for(int i = 0; i < CAUSTIC_PHOTON_COUNT; i++)
@@ -232,46 +235,8 @@ void RTRRadianceRenderer::execute()
         }
     }
 
-
-
-    int causticPhotonCount = 0;
-    int diffusePhotonCount = 0;
-    for(int i = 0; i < allPhotons.size(); i++)
-    {
-        if(allPhotons[i]->type == Photon::Type::CAUSTIC)
-        {
-            causticPhotonCount++;
-        }
-        else
-        {
-            diffusePhotonCount++;
-        }
-    }
-    qDebug() << "CAUSTIC " << causticPhotonCount;
-    qDebug() << "DIFFUSE " << diffusePhotonCount;
-    stlDiffusePhotons.clear();
-    stlDiffusePhotons = allPhotons.toStdVector();
-    /*while(causticPhotons.size() < 5000)
-    {
-        RTRVector3D lightSource(-1.2 + sampler->generateRandomNumber(-1.0, 1.0)
-                                                          , 0 + sampler->generateRandomNumber(-2.0, 2.0)
-                                                          , 4.99);
-        RTRVector3D lightDirection;
-        do {
-            lightDirection = sampler->generateRandomDirection();
-        } while(lightDirection.z() > 0);
-        lightDirection.vectorNormalize();
-        renderPhoton(lightSource, lightDirection, causticPhotons, chosenElement, true);
-        //qDebug() << causticPhotons.size();
-        if (causticPhotons.size() > 0 && causticPhotons.size() % 1000 == 0)
-        {
-            qDebug() << causticPhotons.size();
-        }
-    }*/
-    stlCausticPhotons.clear();
-    stlCausticPhotons = causticPhotons.toStdVector();
-    causticPhotonAdapter = new NanoFlannPhotonAdaptor(stlCausticPhotons);
-    diffusePhotonAdapter = new NanoFlannPhotonAdaptor(stlDiffusePhotons);
+    causticPhotonAdapter = new NanoFlannPhotonAdaptor(causticPhotons);
+    diffusePhotonAdapter = new NanoFlannPhotonAdaptor(diffusePhotons);
     causticPhotonMap = new PhotonKdTree(3, *causticPhotonAdapter);
     causticPhotonMap->buildIndex();
     diffusePhotonMap = new PhotonKdTree(3, *diffusePhotonAdapter);
@@ -279,5 +244,5 @@ void RTRRadianceRenderer::execute()
     //causticPhotonMap = NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D>::construct(causticPhotons.toStdVector());
     //diffusePhotonMap = NearestSearchKdTree<Photon, double, 3, AccessRTRVector3D>::construct(diffusePhotons.toStdVector());
     qDebug() << causticPhotons.size();
-    qDebug() << stlDiffusePhotons.size();
+    qDebug() << diffusePhotons.size();
 }
