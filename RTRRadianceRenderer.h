@@ -84,8 +84,8 @@ public:
     NanoFlannPhotonAdaptor *diffusePhotonAdapter;
     PhotonKdTree *diffusePhotonMap = nullptr;
     PhotonKdTree *causticPhotonMap = nullptr;
-    std::map<RTRRenderElement*, std::vector<Photon*>> elementDiffusePhotons;
-    std::map<RTRRenderElement*, std::vector<Photon*>> elementCausticPhotons;
+    std::map<RTRRenderElement*, std::vector<Photon*>*> elementDiffusePhotons;
+    std::map<RTRRenderElement*, std::vector<Photon*>*> elementCausticPhotons;
     std::map<RTRRenderElement*, PhotonKdTree*> elementDiffusePhotonMap;
     std::map<RTRRenderElement*, PhotonKdTree*> elementCausticPhotonMap;
     

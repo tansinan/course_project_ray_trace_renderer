@@ -18,6 +18,7 @@ public:
 	double& z();
 	double z() const;
 	RTRVector3D crossProduct(const RTRVector3D &other) const;
+    RTRVector3D operator*(double ratio) const;
 };
 
 #endif

@@ -58,3 +58,8 @@ RTRVector3D RTRVector3D::crossProduct(const RTRVector3D& other) const
 		x()*other.y() - y()*other.x()
 		);
 }
+
+RTRVector3D RTRVector3D::operator*(double ratio) const
+{
+	return RTRVector3D(x()*ratio, y()*ratio, z()*ratio);
+}

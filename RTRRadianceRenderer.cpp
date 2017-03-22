@@ -177,7 +177,7 @@ void RTRRadianceRenderer::execute()
     }
 
     const int PHOTON_COUNT = 1000000;
-    const int CAUSTIC_PHOTON_COUNT = 400000;
+    const int CAUSTIC_PHOTON_COUNT = 40000000;
 
     auto emissionElements = renderer->emissionElements;
 
@@ -241,6 +241,36 @@ void RTRRadianceRenderer::execute()
     causticPhotonMap->buildIndex();
     diffusePhotonMap = new PhotonKdTree(3, *diffusePhotonAdapter);
     diffusePhotonMap->buildIndex();
+    for(auto photon : diffusePhotons)
+    {
+        if(elementDiffusePhotons[photon->intersectElement] == nullptr)
+        {
+            elementDiffusePhotons[photon->intersectElement] = new std::vector<Photon*>();
+        }
+        elementDiffusePhotons[photon->intersectElement]->push_back(photon);
+    }
+    for(auto photon : causticPhotons)
+    {
+        if(elementCausticPhotons[photon->intersectElement] == nullptr)
+        {
+            elementCausticPhotons[photon->intersectElement] = new std::vector<Photon*>();
+        }
+        elementCausticPhotons[photon->intersectElement]->push_back(photon);
+    }
+    for (std::pair<RTRRenderElement* const, std::vector<Photon*>*>& i: elementDiffusePhotons)
+    {
+        qDebug() << i.first;
+        auto adapter = new NanoFlannPhotonAdaptor(*i.second);
+        elementDiffusePhotonMap[i.first] = new PhotonKdTree(3, *adapter);
+        elementDiffusePhotonMap[i.first]->buildIndex();
+        qDebug() << "?";
+    }
+    for (std::pair<RTRRenderElement* const, std::vector<Photon*>*>& i: elementCausticPhotons)
+    {
+        auto adapter = new NanoFlannPhotonAdaptor(*i.second);
+        elementCausticPhotonMap[i.first] = new PhotonKdTree(3, *adapter);
+        elementCausticPhotonMap[i.first]->buildIndex();
+    }
     //causticPhotonMap = NearestSearchKdTree<Photon*, double, 3, AccessRTRVector3D>::construct(causticPhotons.toStdVector());
     //diffusePhotonMap = NearestSearchKdTree<Photon, double, 3, AccessRTRVector3D>::construct(diffusePhotons.toStdVector());
     qDebug() << causticPhotons.size();

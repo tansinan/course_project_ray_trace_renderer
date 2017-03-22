@@ -4,6 +4,7 @@
 #include <QImage>
 #include <qdebug.h>
 #include <ctime>
+#include <cmath>
 #include "RTRRadianceRenderer.h"
 
 const static double PI = 3.1415926536;
@@ -15,9 +16,90 @@ RTRRenderThread::RTRRenderThread(RTRRenderer* _renderer, int _threadIndex)
     renderResult = new RTRColor[renderer->image->width()*renderer->image->height()];
 }
 
+
+static double circleAreaI(const RTRVector3D &p1, const RTRVector3D &p2, const RTRVector3D &p3, double radius2)
+{
+    RTRVector3D p1ToP2 = p1 - p2;
+    RTRVector3D p1ToP3 = p1 - p3;
+    RTRVector3D p2ToP3 = p3 - p2;
+    RTRVector3D p2ToP3Norm = p2ToP3;
+    p2ToP3Norm.vectorNormalize();
+    double dist = qSqrt(p1ToP2.vectorLengthSquared() - qPow(p1ToP2.dotProduct(p2ToP3Norm), 2));
+    bool longEdgeIsP1P3 = true;
+    double edgeShort = p1ToP2.vectorLength();
+    double edgeLong = p1ToP3.vectorLength();
+    if(edgeLong < edgeShort)
+    {
+        std::swap(edgeLong, edgeShort);
+        longEdgeIsP1P3 = false;
+    }
+    if(radius2 >= edgeLong * edgeLong)
+    {
+        return p1ToP2.crossProduct(p1ToP3).vectorLength() / 2.0;
+    }
+    double angle = acos(p1ToP2.dotProduct(p1ToP3) / p1ToP2.vectorLength() / p1ToP3.vectorLength());
+    if(radius2 <= dist * dist)
+    {
+        return angle / 2 * radius2;
+    }
+    
+    if(radius2 < edgeShort * edgeShort)
+    {
+        // The arc and triangle edge could have one or two intersect(s)
+        if(longEdgeIsP1P3)
+        {
+            if(p1ToP2.dotProduct(p2ToP3) > 0)
+            {
+                double l = sqrt(radius2 - dist * dist);
+                double angleInner = acos(dist / sqrt(radius2));
+                return l * dist + (angle - angleInner * 2) / 2 * radius2;       
+            }
+            else return angle / 2 * radius2;
+        }
+        else
+        {
+            if(p1ToP3.dotProduct(p2ToP3) < 0)
+            {
+                double l = sqrt(radius2 - dist * dist);
+                double angleInner = acos(dist / sqrt(radius2));
+                return l * dist + (angle - angleInner * 2) / 2 * radius2;       
+            }
+            else return angle / 2 * radius2;
+        }
+    }
+    else
+    {
+        double distanceAlongEdge = sqrt(radius2 - dist * dist);
+        RTRVector3D predPoint = p2 + p2ToP3Norm * p1ToP2.dotProduct(p2ToP3Norm);
+        RTRVector3D possibleIntersect1 = predPoint + p2ToP3Norm * distanceAlongEdge;
+        RTRVector3D possibleIntersect2 = predPoint - p2ToP3Norm * distanceAlongEdge;
+        RTRVector3D v;
+        if(RTRVector3D(possibleIntersect1 - p2).dotProduct(possibleIntersect1 - p3) < 0)
+        {
+            v = p1 - possibleIntersect1;
+        }
+        else
+        {
+            v = p1 - possibleIntersect2;
+        }
+        if(longEdgeIsP1P3)
+        {
+            return acos(v.dotProduct(p1ToP3) / v.vectorLength() / p1ToP3.vectorLength())
+                / 2 * radius2 + v.crossProduct(p1ToP2).vectorLength() / 2;
+        }
+        else
+        {
+            return acos(v.dotProduct(p1ToP2) / v.vectorLength() / p1ToP2.vectorLength())
+                / 2 * radius2 + v.crossProduct(p1ToP3).vectorLength() / 2;
+        }
+    }
+    qDebug() << "This is impossible";
+    return angle / 2 * radius2;
+}
+
 RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     const std::vector<Photon*>& photons,
-    RTRVector3D location, RTRVector3D normal)
+    RTRVector3D location, RTRVector3D normal, RTRRenderElement *element)
 {
     if(photonMap->size() == 0)
         return RTRColor(0.0, 0.0, 0.0);
@@ -33,7 +115,9 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
     }
     RTRColor lastEstimation(0.0, 0.0, 0.0);
     RTRColor radioEst(0.0, 0.0, 0.0);
-    for(int i = MIN_ESTIMATION_PHOTON_COUNT; i <= ESTIMATION_PHOTON_COUNT; i *= 2)
+    radioEst = estimateRadianceByPhotonMapInternal(photonMap, location, normal, photons, photonIndex,
+                                        photonDistance, ESTIMATION_PHOTON_COUNT);
+    /*for(int i = MIN_ESTIMATION_PHOTON_COUNT; i <= ESTIMATION_PHOTON_COUNT; i *= 2)
     {
         radioEst = estimateRadianceByPhotonMapInternal(photonMap, location, normal, photons, photonIndex,
                                             photonDistance, i);
@@ -48,8 +132,24 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMap(PhotonKdTree* photonMap,
             if(l2 > 1.2*l1 || l2 < 0.8*l1)
                 return lastEstimation;
         }
+    }*/
+    double largestDistance = photonDistance[ESTIMATION_PHOTON_COUNT - 1];
+    double area = circleAreaI(location, element->triangle3D->vertices[0],
+            element->triangle3D->vertices[1], largestDistance)
+        + circleAreaI(location, element->triangle3D->vertices[1],
+            element->triangle3D->vertices[2], largestDistance)
+        + circleAreaI(location, element->triangle3D->vertices[2],
+            element->triangle3D->vertices[0], largestDistance);
+    static bool aaa = true;
+    if(xBegin == 0 && yBegin == 0 && aaa)
+    for(int i = 0; i < 5000; i++)
+    {
+        std::cout << i << ","  << circleAreaI(RTRVector3D(0,0,0), RTRVector3D(-1,1,0),
+            RTRVector3D(2,1,0), qPow(i * 0.001, 2)) << endl;
+        aaa = false;
     }
-    return radioEst;
+    //exit(0);
+    return radioEst / area;
 }
 
 RTRColor RTRRenderThread::estimateRadianceByPhotonMapInternal(PhotonKdTree* photonMap, RTRVector3D location, RTRVector3D normal,
@@ -68,7 +168,7 @@ RTRColor RTRRenderThread::estimateRadianceByPhotonMapInternal(PhotonKdTree* phot
             radioEst = radioEst + photon->color * filter;
         }
     }
-    return radioEst * (1 / PI / largestDistance);
+    return radioEst;// * (1 / PI / largestDistance);
 }
 
 RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, RTRVector3D location, RTRVector3D normal)
@@ -409,9 +509,12 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     else
     {
         if (diffuseCount >= 1) {
-            return estimateRadianceByPhotonMap(radianceRenderer->diffusePhotonMap,
-                radianceRenderer->diffusePhotons,
-                intersectPoint, intersectNormal) * intersectColor;
+            //return estimateRadianceByPhotonMap(radianceRenderer->diffusePhotonMap,
+            //    radianceRenderer->diffusePhotons,
+            //    intersectPoint, intersectNormal) * intersectColor;
+            return estimateRadianceByPhotonMap(radianceRenderer->elementDiffusePhotonMap[intersectElement],
+                *radianceRenderer->elementDiffusePhotons[intersectElement],
+                intersectPoint, intersectNormal, intersectElement) * intersectColor;
         }
         RTRVector3D nextDirection;
         if (intersectNormal.dotProduct(ray.direction) > 0)
@@ -431,16 +534,16 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         renderer->rayTracingKernel->intersect(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
-            return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
-                                                                               radianceRenderer->causticPhotons,
-                                                                               intersectPoint, intersectNormal)) * intersectColor;
+            return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->elementCausticPhotonMap[intersectElement],
+                    *radianceRenderer->elementCausticPhotons[intersectElement],
+                    intersectPoint, intersectNormal, intersectElement)) * intersectColor;
         }
         //TODO: 只需要在第一层使用caustic photon map
         return (diEstimation +
             renderRay(refractionRay, iterationCount + 1, intersectElement, refracInAir, diffuseCount + 1, specularCount)
             * qAbs(intersectNormal.dotProduct(refractionRay.direction)) * 2
-                + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,
-                                              radianceRenderer->causticPhotons,
-                                              intersectPoint, intersectNormal)) * intersectColor;
+                + estimateRadianceByPhotonMap(radianceRenderer->elementCausticPhotonMap[intersectElement],
+                    *radianceRenderer->elementCausticPhotons[intersectElement],
+                    intersectPoint, intersectNormal, intersectElement)) * intersectColor;
     }
 }
