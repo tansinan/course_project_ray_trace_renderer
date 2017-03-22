@@ -13,6 +13,11 @@ EmbreeRayTracingKernel::~EmbreeRayTracingKernel()
 
 void EmbreeRayTracingKernel::buildIndex(const QVector<RTRRenderElement*>& elementTable)
 {
+    struct Vertex { float x, y, z, a; };
+    struct Triangle 
+    {
+        unsigned v0, v1, v2;//, materialID;
+    };
     this->elementTable = elementTable;
     embreeDevice = rtcNewDevice(nullptr);
     //error_handler(rtcDeviceGetError(embreeDevice));
@@ -21,16 +26,14 @@ void EmbreeRayTracingKernel::buildIndex(const QVector<RTRRenderElement*>& elemen
     //rtcDeviceSetErrorFunction(embreeDevice, error_handler);
 
     /* create scene */
-    embreeScene = rtcDeviceNewScene(embreeDevice, RTC_SCENE_STATIC,RTC_INTERSECT1);
+    embreeScene = rtcDeviceNewScene(embreeDevice, RTC_SCENE_STATIC, RTC_INTERSECT1);
+    qDebug() << sizeof(unsigned);
+    qDebug() << sizeof(Vertex);
+    qDebug() << sizeof(Triangle);
+    qDebug() << "embreeScene = " << embreeScene;
 
     int vertexCount = elementTable.size() * 3;
     int triangleCount = elementTable.size();
-    
-    struct Vertex { float x, y, z, a; };
-    struct Triangle 
-    {
-        unsigned v0, v1, v2, materialID;
-    };
     
     unsigned int mesh = rtcNewTriangleMesh(
         embreeScene, RTC_GEOMETRY_STATIC, triangleCount, vertexCount);
@@ -47,18 +50,30 @@ void EmbreeRayTracingKernel::buildIndex(const QVector<RTRRenderElement*>& elemen
         }
     }
     rtcUnmapBuffer(embreeScene, mesh, RTC_VERTEX_BUFFER);
+    
+    //embreeScene = rtcDeviceNewScene(embreeDevice, RTC_SCENE_STATIC,RTC_INTERSECT1);
 
-    Triangle* triangles = (Triangle*)rtcMapBuffer(embreeScene, mesh, RTC_INDEX_BUFFER);
+    Triangle* triangles;
+    qDebug() << "triangles = " << triangleCount;
+    triangles = (Triangle*)rtcMapBuffer(embreeScene, mesh, RTC_INDEX_BUFFER);
+    qDebug() << "triangles = " << triangles;
     for(int i = 0; i < triangleCount; i++)
     {
         triangles[i].v0 = 3 * i;
         triangles[i].v1 = 3 * i + 1;
         triangles[i].v2 = 3 * i + 2;
     }
+    qDebug() << sizeof(unsigned);
+    qDebug() << sizeof(Triangle);
+    qDebug() << "embreeScene = " << embreeScene;
     rtcUnmapBuffer(embreeScene, mesh, RTC_INDEX_BUFFER);
 
     // commit changes to scene
+    qDebug() << sizeof(unsigned);
+    qDebug() << sizeof(Triangle);
+    qDebug() << "embreeScene = " << embreeScene;
     rtcCommit(embreeScene);
+    //exit(0);
 }
 
 void EmbreeRayTracingKernel::intersect(
@@ -81,5 +96,13 @@ void EmbreeRayTracingKernel::intersect(
     embreeRay.mask = -1;
     embreeRay.time = 0;
     rtcIntersect(embreeScene, embreeRay);
-    qDebug() << embreeRay.geomID << embreeRay.primID;
+    if(embreeRay.primID != RTC_INVALID_GEOMETRY_ID)
+    {
+        searchResult = elementTable[embreeRay.primID];
+    }
+    else
+    {
+        searchResult = nullptr;
+    }
+    //qDebug() << embreeRay.geomID << embreeRay.primID;
 }

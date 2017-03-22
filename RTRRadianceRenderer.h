@@ -73,7 +73,7 @@ public:
     RTRRenderer *renderer = nullptr;
     RTRModel* model;
     QVector<RTRRenderElement*> elements;
-    SimpleKdTreeRayTracingKernel* elementsCache;
+    AbstractRayTracingKernel* rayTracingKernel;
     RTRCamera* camera;
     QImage* image;
     SamplingUtil* sampler;

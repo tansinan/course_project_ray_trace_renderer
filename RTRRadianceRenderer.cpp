@@ -25,7 +25,7 @@ void RTRRadianceRenderer::renderPhoton(
     {
 
         RTRRay ray(location, direction, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
-        elementsCache->intersect(intersectElement, ray, intersectElement);
+        rayTracingKernel->intersect(intersectElement, ray, intersectElement);
         if(intersectElement == nullptr)
         {
             return;
@@ -179,7 +179,7 @@ void RTRRadianceRenderer::execute()
     }
 
     const int PHOTON_COUNT = 1000000;
-    const int CAUSTIC_PHOTON_COUNT = 40000000;
+    const int CAUSTIC_PHOTON_COUNT = 400000;
 
     auto emissionElements = renderer->emissionElements;
 
@@ -229,8 +229,12 @@ void RTRRadianceRenderer::execute()
         }
         renderPhoton(lightSource, lightDirection, causticPhotons, chosenElement,
             lightColor, true);
-        if (causticPhotons.size() % 10000 == 0)
-            qDebug() << causticPhotons.size();
+        if (i % 100000 == 0)
+        {
+            qDebug() <<
+                QString::number(i) + "/" + QString::number(CAUSTIC_PHOTON_COUNT)
+                + " caustic photons emitted";
+        }
     }
 
 

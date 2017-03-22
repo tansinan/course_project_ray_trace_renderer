@@ -42,5 +42,7 @@ add_executable(${PROJECT_NAME}
     RenderingOptions.cpp
     RayTracing/AbstractRayTracingKernel.cpp
     RayTracing/SimpleKdTreeRayTracingKernel.cpp
+    RayTracing/EmbreeRayTracingKernel.cpp
 )
 qt5_use_modules(${PROJECT_NAME} Widgets Gui Core)
+target_link_libraries(${PROJECT_NAME} embree)

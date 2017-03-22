@@ -6,7 +6,7 @@
 #include "RTRGeometry.h"
 #include "RTRMaterial.h"
 #include "RTRRenderElement.h"
-#include "RayTracing/SimpleKdTreeRayTracingKernel.h"
+#include "RayTracing/AbstractRayTracingKernel.h"
 #include "SamplingUtil.h"
 
 class RTRRenderThread;
@@ -23,7 +23,7 @@ public:
     RTRModel* model;
     QVector<RTRRenderElement*> elements;
     QVector<RTRRenderElement*> emissionElements;
-    SimpleKdTreeRayTracingKernel* elementsCache;
+    AbstractRayTracingKernel* rayTracingKernel;
     RTRCamera* camera;
     QImage* image;
 public:

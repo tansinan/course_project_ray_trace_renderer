@@ -85,7 +85,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingObject(RTRRenderElement* element, 
         }
         RTRRay diRay(location, directLightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
         RTRRenderElement* emissionElement = nullptr;
-        renderer->elementsCache->intersect(emissionElement, diRay, element);
+        renderer->rayTracingKernel->intersect(emissionElement, diRay, element);
         if (emissionElement != nullptr && emissionElement->material->emissionStrength > 0.0001)
         {
             auto e = emissionElement->material->emissionStrength;
@@ -111,7 +111,7 @@ RTRColor RTRRenderThread::estimateDIBySamplingLightSource(RTRRenderElement *elem
         //lightDirection.vectorNormalize();
         RTRRay diRay(lightSource, lightDirection, RTRRay::CREATE_FROM_POINT_AND_DIRECTION);
         RTRRenderElement* rayCastElement = nullptr;
-        renderer->elementsCache->intersect(rayCastElement, diRay, chosenElement);
+        renderer->rayTracingKernel->intersect(rayCastElement, diRay, chosenElement);
         RTRVector3D emissionNormal = chosenElement->triangle3D->plane.normal;
         emissionNormal.vectorNormalize();
         if (rayCastElement == element)
@@ -212,7 +212,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
     //����Ԫ��
 
     RTRRenderElement* intersectElement = NULL;
-    renderer->elementsCache->intersect(intersectElement, ray, elementFrom);
+    renderer->rayTracingKernel->intersect(intersectElement, ray, elementFrom);
 
     //�������߲����κ������ཻ�ǿ϶��ǿ���һ���ˡ���
 
@@ -291,7 +291,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
             RTRColor lightColor = lightPoint.colorAt(intersectPoint);
             RTRRenderElement* lightBlocker = NULL;
             RTRRay blockTestRay = RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS);
-            renderer->elementsCache->search(lightBlocker, blockTestRay, intersectElement);
+            renderer->rayTracingKernel->search(lightBlocker, blockTestRay, intersectElement);
             double distanceToLight = (intersectPoint - lightPoint.getPosition()).vectorLengthSquared();
             RTRVector3D blkIntersectPoint(0.0, 0.0, 0.0);
             RTRVector3D blkIntersectNormal(0.0, 0.0, 0.0);
@@ -347,7 +347,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
 
     //������Ӱ��ֻ���Ǿֲ����գ������䲻���ĵط�û��Diffuse��Specular
     //RTRRenderElement* directLight = NULL;
-    //renderer->elementsCache->search(directLight, RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS), intersectElement);
+    //renderer->rayTracingKernel->search(directLight, RTRRay(intersectPoint, lightPoint.getPosition(), RTRRay::CREATE_FROM_POINTS), intersectElement);
     /*if (directLight != NULL)
     {
     diffuseColor = RTRColor(0.0, 0.0, 0.0);
@@ -443,7 +443,7 @@ RTRColor RTRRenderThread::renderRay(const RTRRay& ray, int iterationCount,
         RTRColor diEstimation = estimateDIBySamplingLightSource(intersectElement, intersectPoint, intersectNormal);
         //return diEstimation * intersectColor;
         RTRRenderElement* emissionElement = nullptr;
-        renderer->elementsCache->intersect(emissionElement, refractionRay, intersectElement);
+        renderer->rayTracingKernel->intersect(emissionElement, refractionRay, intersectElement);
         if (emissionElement == nullptr || emissionElement->material->emissionStrength > 0.0001)
         {
             return (diEstimation + estimateRadianceByPhotonMap(radianceRenderer->causticPhotonMap,

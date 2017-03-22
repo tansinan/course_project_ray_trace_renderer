@@ -8,6 +8,8 @@
 #include "RTRRenderThread.h"
 #include "RTRRadianceRenderer.h"
 #include "RTRModelPolygen.h"
+#include "RayTracing/SimpleKdTreeRayTracingKernel.h"
+#include "RayTracing/EmbreeRayTracingKernel.h"
 
 RTRRenderer::RTRRenderer(QImage *_image)
 {
@@ -80,8 +82,11 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
 
     //创建Kd树以便加速搜索。
 
-    elementsCache = new SimpleKdTreeRayTracingKernel();
-    elementsCache->buildIndex(elements);
+    rayTracingKernel = new EmbreeRayTracingKernel();
+    rayTracingKernel->buildIndex(elements);
+    
+    //auto rayTracingKernel2 = new SimpleKdTreeRayTracingKernel();
+    //rayTracingKernel2->buildIndex(elements);
 
     renderThreads = new RTRRenderThread*[8];
     for (int i = 0; i < 8; i++)
@@ -103,7 +108,7 @@ bool RTRRenderer::render(RTRModel* _model, RTRCamera* _camera, int pass)
     //Build the photon map
     radianceRenderer->model = model;
     radianceRenderer->elements = elements;
-    radianceRenderer->elementsCache = elementsCache;
+    radianceRenderer->rayTracingKernel = rayTracingKernel;
     radianceRenderer->sampler = &this->sampler;
     radianceRenderer->execute();
 
